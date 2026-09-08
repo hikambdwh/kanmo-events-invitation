@@ -14,6 +14,7 @@ class CheckInController extends Controller
     public function store(
         Request $request
     ): JsonResponse {
+
         $validated = $request->validate([
             'qr_value' => [
                 'required',
@@ -22,91 +23,189 @@ class CheckInController extends Controller
             ],
         ]);
 
-        $qrValue = trim(
+        $input = trim(
             $validated['qr_value']
         );
 
-        /*
-         * QR harus memiliki format:
-         *
-         * RogerVivier:TOKEN
-         */
-        if (!str_contains($qrValue, ':')) {
-            return response()->json([
-                'status' => 'invalid',
-                'message' => 'Format QR tidak valid.',
-            ], 422);
-        }
-
-        [$eventPrefix, $token] =
-            explode(':', $qrValue, 2);
-
-        $eventPrefix = trim($eventPrefix);
-        $token = trim($token);
-
-        if (
-            $eventPrefix === ''
-            || $token === ''
-        ) {
-            return response()->json([
-                'status' => 'invalid',
-                'message' => 'Format QR tidak valid.',
-            ], 422);
-        }
-
-        $event = Event::query()
-            ->where(
-                'qr_prefix',
-                $eventPrefix
-            )
-            ->first();
-
-        if (!$event) {
-            return response()->json([
-                'status' => 'invalid',
-                'message' => 'Event QR tidak ditemukan.',
-            ], 404);
-        }
-
         return DB::transaction(
             function () use (
-                $event,
-                $token,
+                $input,
                 $request
             ) {
 
-                /*
-                 * lockForUpdate penting jika QR
-                 * hampir bersamaan discan oleh
-                 * dua staff.
-                 */
-                $invitation = Invitation::query()
-                    ->where(
-                        'event_id',
-                        $event->id
-                    )
-                    ->where(
-                        'qr_token',
-                        $token
-                    )
-                    ->lockForUpdate()
-                    ->first();
+                $event = null;
+                $invitation = null;
 
-                if (!$invitation) {
-                    return response()->json([
-                        'status' => 'invalid',
-                        'message' =>
-                        'QR tidak terdaftar.',
-                    ], 404);
+                /*
+                 * =========================================
+                 * MODE 1
+                 * QR SCANNER
+                 *
+                 * Format:
+                 * RogerVivier:TOKEN
+                 * =========================================
+                 */
+                if (str_contains($input, ':')) {
+
+                    [
+                        $eventPrefix,
+                        $token
+                    ] = explode(
+                        ':',
+                        $input,
+                        2
+                    );
+
+                    $eventPrefix =
+                        trim($eventPrefix);
+
+                    $token =
+                        trim($token);
+
+                    if (
+                        $eventPrefix === ''
+                        || $token === ''
+                    ) {
+                        return response()->json([
+                            'status' => 'invalid',
+                            'message' =>
+                            'Format QR tidak valid.',
+                        ], 422);
+                    }
+
+
+                    $event = Event::query()
+                        ->where(
+                            'qr_prefix',
+                            $eventPrefix
+                        )
+                        ->first();
+
+
+                    if (!$event) {
+                        return response()->json([
+                            'status' => 'invalid',
+                            'message' =>
+                            'Event QR tidak ditemukan.',
+                        ], 404);
+                    }
+
+
+                    $invitation =
+                        Invitation::query()
+                        ->where(
+                            'event_id',
+                            $event->id
+                        )
+                        ->where(
+                            'qr_token',
+                            $token
+                        )
+                        ->lockForUpdate()
+                        ->first();
+
+
+                    if (!$invitation) {
+                        return response()->json([
+                            'status' => 'invalid',
+                            'message' =>
+                            'QR tidak terdaftar.',
+                        ], 404);
+                    }
                 }
 
+                /*
+                 * =========================================
+                 * MODE 2
+                 * MANUAL GUEST CODE
+                 *
+                 * Contoh:
+                 * guest00001
+                 * =========================================
+                 */ else {
+
+                    $guestCode = $input;
+
+
+                    /*
+                     * Ambil maksimal 2 untuk memastikan
+                     * guest_code tidak duplicate.
+                     */
+                    $invitations =
+                        Invitation::query()
+                        ->where(
+                            'guest_code',
+                            $guestCode
+                        )
+                        ->limit(2)
+                        ->lockForUpdate()
+                        ->get();
+
+
+                    if ($invitations->isEmpty()) {
+
+                        return response()->json([
+                            'status' => 'invalid',
+
+                            'message' =>
+                            'Guest code tidak ditemukan.',
+                        ], 404);
+                    }
+
+
+                    /*
+                     * Guest code sebaiknya unique.
+                     *
+                     * Kalau ternyata terdapat kode yang
+                     * sama pada lebih dari satu invitation,
+                     * jangan melakukan check-in otomatis.
+                     */
+                    if ($invitations->count() > 1) {
+
+                        return response()->json([
+                            'status' => 'invalid',
+
+                            'message' =>
+                            'Guest code ditemukan pada lebih dari satu invitation.',
+                        ], 422);
+                    }
+
+
+                    $invitation =
+                        $invitations->first();
+
+
+                    $event = Event::query()
+                        ->find(
+                            $invitation->event_id
+                        );
+
+
+                    if (!$event) {
+
+                        return response()->json([
+                            'status' => 'invalid',
+
+                            'message' =>
+                            'Event invitation tidak ditemukan.',
+                        ], 404);
+                    }
+                }
+
+
+                /*
+                 * =========================================
+                 * CHECK ALREADY CHECKED IN
+                 * =========================================
+                 */
                 if ($invitation->checked_in_at) {
+
                     return response()->json([
                         'status' =>
                         'already_checked_in',
 
                         'message' =>
-                        'QR sudah check-in/discan.',
+                        'Guest sudah check-in.',
 
                         'guest_code' =>
                         $invitation->guest_code,
@@ -125,19 +224,31 @@ class CheckInController extends Controller
                         $invitation
                             ->checkedInBy
                             ?->name,
+
                     ], 409);
                 }
 
+
+                /*
+                 * =========================================
+                 * CHECK-IN
+                 * =========================================
+                 */
                 $invitation->update([
+
                     'checked_in_at' =>
                     now(),
 
                     'checked_in_by' =>
                     $request->user()->id,
+
                 ]);
 
+
                 return response()->json([
-                    'status' => 'success',
+
+                    'status' =>
+                    'success',
 
                     'message' =>
                     'Check-in berhasil.',
@@ -154,6 +265,7 @@ class CheckInController extends Controller
                         ->format(
                             'd M Y H:i:s'
                         ),
+
                 ]);
             }
         );

@@ -338,11 +338,18 @@ class InvitationExportController extends Controller
 
                 /*
                 * QR ONLY:
-                * langsung masukkan PNG dari QR Server.
+                * Tambahkan Guest Code
+                * tepat di bawah QR.
                 */
+                $finalQrImage =
+                    $this->renderQrWithGuestCode(
+                        $response->body(),
+                        $invitation->guest_code
+                    );
+
                 $zip->addFromString(
                     $imagePath,
-                    $response->body()
+                    $finalQrImage
                 );
             }
 
@@ -369,7 +376,7 @@ class InvitationExportController extends Controller
                     $excelBinary
                 );
             }
-            
+
 
             $zip->close();
 
@@ -430,7 +437,8 @@ class InvitationExportController extends Controller
     }
 
 
-    public function download(Event $event,Export $export): StreamedResponse {
+    public function download(Event $event, Export $export): StreamedResponse
+    {
         $this->authorizeExport(
             $event,
             $export
@@ -814,7 +822,7 @@ class InvitationExportController extends Controller
 
                 $response =
                     $responses[(string)
-                        $invitation->id] ?? null;
+                    $invitation->id] ?? null;
 
                 if (
                     !$response instanceof Response
@@ -855,12 +863,13 @@ class InvitationExportController extends Controller
 
                 $response =
                     $responses[(string)
-                        $invitation->id];
+                    $invitation->id];
 
                 $finalImage =
                     $this->renderInvitation(
                         $export,
-                        $response->body()
+                        $response->body(),
+                        $invitation->guest_code
                     );
 
                 $baseFolder =
@@ -968,9 +977,12 @@ class InvitationExportController extends Controller
 
     private function renderInvitation(
         Export $export,
-        string $qrBinary
+        string $qrBinary,
+        string $guestCode
     ): string {
+
         $meta = $export->meta;
+
 
         $backgroundPath =
             Storage::disk('public')
@@ -978,29 +990,38 @@ class InvitationExportController extends Controller
                 $meta['background_path']
             );
 
+
         $backgroundBinary =
             file_get_contents(
                 $backgroundPath
             );
+
 
         $background =
             imagecreatefromstring(
                 $backgroundBinary
             );
 
+
         if (!$background) {
+
             throw new RuntimeException(
                 'Background image tidak valid.'
             );
         }
+
 
         $qrImage =
             imagecreatefromstring(
                 $qrBinary
             );
 
+
         if (!$qrImage) {
-            imagedestroy($background);
+
+            imagedestroy(
+                $background
+            );
 
             throw new RuntimeException(
                 'QR image tidak valid.'
@@ -1009,10 +1030,14 @@ class InvitationExportController extends Controller
 
 
         $canvasWidth =
-            imagesx($background);
+            imagesx(
+                $background
+            );
 
         $canvasHeight =
-            imagesy($background);
+            imagesy(
+                $background
+            );
 
 
         $qrSettings =
@@ -1020,17 +1045,20 @@ class InvitationExportController extends Controller
 
 
         /*
-     * Ratio → pixel asli.
+     * Ratio editor →
+     * pixel asli invitation.
      */
         $qrSize = (int) round(
             $canvasWidth
                 * $qrSettings['size']
         );
 
+
         $qrX = (int) round(
             $canvasWidth
                 * $qrSettings['x']
         );
+
 
         $qrY = (int) round(
             $canvasHeight
@@ -1039,7 +1067,9 @@ class InvitationExportController extends Controller
 
 
         /*
-     * Tempel QR ke invitation.
+     * ========================================
+     * TEMPel QR
+     * ========================================
      */
         imagecopyresampled(
             $background,
@@ -1060,9 +1090,135 @@ class InvitationExportController extends Controller
 
 
         /*
-     * Output selalu PNG.
+     * ========================================
+     * GUEST CODE
+     * ========================================
+     *
+     * Guest code diletakkan tepat
+     * di bawah QR.
+     */
+
+        $gap = max(
+            6,
+            (int) round(
+                $qrSize * 0.02
+            )
+        );
+
+
+        /*
+     * Ukuran badge mengikuti
+     * ukuran QR.
+     */
+        $labelHeight = max(
+            36,
+            (int) round(
+                $qrSize * 0.14
+            )
+        );
+
+
+        $labelX =
+            $qrX;
+
+
+        $labelY =
+            $qrY
+            + $qrSize
+            + $gap;
+
+
+        $labelWidth =
+            $qrSize;
+
+
+        /*
+     * Kalau QR terlalu dekat
+     * dengan bagian bawah canvas,
+     * pastikan guest code tidak
+     * terpotong.
+     */
+        if (
+            $labelY
+            + $labelHeight
+            > $canvasHeight
+        ) {
+
+            $labelY =
+                max(
+                    0,
+                    $canvasHeight
+                        - $labelHeight
+                        - 5
+                );
+        }
+
+
+        /*
+     * Background putih agar kode
+     * tetap terbaca di atas design
+     * dengan warna apa pun.
+     */
+        $white =
+            imagecolorallocate(
+                $background,
+                255,
+                255,
+                255
+            );
+
+
+        imagefilledrectangle(
+            $background,
+
+            $labelX,
+            $labelY,
+
+            $labelX
+                + $labelWidth,
+
+            $labelY
+                + $labelHeight,
+
+            $white
+        );
+
+
+        /*
+     * Tentukan scale tulisan.
+     */
+        $textScale = max(
+            2,
+            (int) round(
+                $qrSize / 300
+            )
+        );
+
+
+        $this->drawCenteredBitmapText(
+            $background,
+
+            strtoupper(
+                $guestCode
+            ),
+
+            $labelX,
+            $labelY,
+
+            $labelWidth,
+            $labelHeight,
+
+            $textScale
+        );
+
+
+        /*
+     * ========================================
+     * OUTPUT PNG
+     * ========================================
      */
         ob_start();
+
 
         imagepng(
             $background,
@@ -1070,19 +1226,27 @@ class InvitationExportController extends Controller
             6
         );
 
+
         $result =
             ob_get_clean();
 
 
-        imagedestroy($background);
-        imagedestroy($qrImage);
+        imagedestroy(
+            $background
+        );
+
+        imagedestroy(
+            $qrImage
+        );
 
 
         if (!$result) {
+
             throw new RuntimeException(
                 'Gagal render invitation.'
             );
         }
+
 
         return $result;
     }
@@ -1224,5 +1388,402 @@ class InvitationExportController extends Controller
 
 
         return $excelBinary;
+    }
+
+    private function renderQrWithGuestCode(
+        string $qrBinary,
+        string $guestCode
+    ): string {
+
+        /*
+     * Convert binary QR
+     * menjadi GD image.
+     */
+        $qrImage =
+            imagecreatefromstring(
+                $qrBinary
+            );
+
+
+        if (!$qrImage) {
+
+            throw new RuntimeException(
+                'QR image tidak valid.'
+            );
+        }
+
+
+        $qrWidth =
+            imagesx(
+                $qrImage
+            );
+
+        $qrHeight =
+            imagesy(
+                $qrImage
+            );
+
+
+        /*
+     * Area tambahan di bawah QR.
+     */
+        $bottomHeight =
+            max(
+                180,
+                (int) round(
+                    $qrHeight * 0.18
+                )
+            );
+
+
+        $canvasWidth =
+            $qrWidth;
+
+
+        $canvasHeight =
+            $qrHeight
+            + $bottomHeight;
+
+
+        /*
+     * Buat canvas baru.
+     */
+        $canvas =
+            imagecreatetruecolor(
+                $canvasWidth,
+                $canvasHeight
+            );
+
+
+        if (!$canvas) {
+
+            imagedestroy(
+                $qrImage
+            );
+
+            throw new RuntimeException(
+                'Gagal membuat canvas QR.'
+            );
+        }
+
+
+        /*
+     * Background putih.
+     */
+        $white =
+            imagecolorallocate(
+                $canvas,
+                255,
+                255,
+                255
+            );
+
+
+        imagefill(
+            $canvas,
+            0,
+            0,
+            $white
+        );
+
+
+        /*
+     * Copy QR original tanpa
+     * mengubah ukurannya.
+     */
+        imagecopy(
+            $canvas,
+            $qrImage,
+
+            0,
+            0,
+
+            0,
+            0,
+
+            $qrWidth,
+            $qrHeight
+        );
+
+
+        /*
+     * ========================================
+     * LABEL "GUEST CODE"
+     * ========================================
+     */
+        $this->drawCenteredBitmapText(
+            $canvas,
+
+            'GUEST CODE',
+
+            0,
+            $qrHeight + 15,
+
+            $canvasWidth,
+            55,
+
+            2
+        );
+
+
+        /*
+     * ========================================
+     * VALUE guest00001
+     * ========================================
+     */
+        $this->drawCenteredBitmapText(
+            $canvas,
+
+            strtoupper(
+                $guestCode
+            ),
+
+            0,
+            $qrHeight + 65,
+
+            $canvasWidth,
+            $bottomHeight - 70,
+
+            4
+        );
+
+
+        /*
+     * Output PNG ke memory.
+     */
+        ob_start();
+
+
+        imagepng(
+            $canvas,
+            null,
+            6
+        );
+
+
+        $result =
+            ob_get_clean();
+
+
+        imagedestroy(
+            $canvas
+        );
+
+        imagedestroy(
+            $qrImage
+        );
+
+
+        if (!$result) {
+
+            throw new RuntimeException(
+                'Gagal membuat QR dengan guest code.'
+            );
+        }
+
+
+        return $result;
+    }
+
+    private function drawCenteredBitmapText(
+        $destination,
+        string $text,
+        int $areaX,
+        int $areaY,
+        int $areaWidth,
+        int $areaHeight,
+        int $requestedScale = 2
+    ): void {
+
+        /*
+     * GD built-in font.
+     *
+     * Tidak membutuhkan file
+     * .ttf tambahan.
+     */
+        $font = 5;
+
+
+        $text =
+            trim(
+                $text
+            );
+
+
+        if ($text === '') {
+            return;
+        }
+
+
+        $baseWidth =
+            imagefontwidth(
+                $font
+            )
+            * strlen(
+                $text
+            );
+
+
+        $baseHeight =
+            imagefontheight(
+                $font
+            );
+
+
+        if (
+            $baseWidth <= 0
+            || $baseHeight <= 0
+        ) {
+            return;
+        }
+
+
+        /*
+     * Cari scale maksimal agar
+     * text tidak keluar dari
+     * area yang tersedia.
+     */
+        $maxScaleByWidth =
+            max(
+                1,
+                (int) floor(
+                    ($areaWidth * 0.90)
+                        / $baseWidth
+                )
+            );
+
+
+        $maxScaleByHeight =
+            max(
+                1,
+                (int) floor(
+                    ($areaHeight * 0.80)
+                        / $baseHeight
+                )
+            );
+
+
+        $scale =
+            max(
+                1,
+                min(
+                    $requestedScale,
+                    $maxScaleByWidth,
+                    $maxScaleByHeight
+                )
+            );
+
+
+        /*
+     * Buat temporary transparent
+     * image untuk tulisan.
+     */
+        $textImage =
+            imagecreatetruecolor(
+                $baseWidth,
+                $baseHeight
+            );
+
+
+        imagesavealpha(
+            $textImage,
+            true
+        );
+
+
+        $transparent =
+            imagecolorallocatealpha(
+                $textImage,
+                0,
+                0,
+                0,
+                127
+            );
+
+
+        imagefill(
+            $textImage,
+            0,
+            0,
+            $transparent
+        );
+
+
+        $black =
+            imagecolorallocate(
+                $textImage,
+                0,
+                0,
+                0
+            );
+
+
+        imagestring(
+            $textImage,
+            $font,
+            0,
+            0,
+            $text,
+            $black
+        );
+
+
+        $targetWidth =
+            $baseWidth
+            * $scale;
+
+
+        $targetHeight =
+            $baseHeight
+            * $scale;
+
+
+        /*
+     * Center horizontal.
+     */
+        $targetX =
+            $areaX
+            + (int) round(
+                (
+                    $areaWidth
+                    - $targetWidth
+                ) / 2
+            );
+
+
+        /*
+     * Center vertical.
+     */
+        $targetY =
+            $areaY
+            + (int) round(
+                (
+                    $areaHeight
+                    - $targetHeight
+                ) / 2
+            );
+
+
+        imagecopyresampled(
+            $destination,
+            $textImage,
+
+            $targetX,
+            $targetY,
+
+            0,
+            0,
+
+            $targetWidth,
+            $targetHeight,
+
+            $baseWidth,
+            $baseHeight
+        );
+
+
+        imagedestroy(
+            $textImage
+        );
     }
 }

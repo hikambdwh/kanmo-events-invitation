@@ -276,44 +276,53 @@
             </div>
 
             {{-- Manual input fallback --}}
-            <div
-                class="mt-6
-                       rounded-2xl
-                       bg-white p-5
-                       shadow-sm">
+            <div class="mt-6
+           rounded-2xl
+           bg-white p-5
+           shadow-sm">
 
                 <details>
 
                     <summary
                         class="cursor-pointer
-                               text-sm
-                               font-medium
-                               text-gray-700">
-                        Manual QR Input
+                   text-sm
+                   font-medium
+                   text-gray-700">
+                        Manual Guest Code
                     </summary>
 
+                    <p class="mt-3 text-xs text-gray-500">
+                        Masukkan guest code yang tercetak di bawah QR.
+                    </p>
 
-                    <form class="mt-4
-                               flex gap-2"
-                        @submit.prevent="
-                            manualCheckIn()
-                        ">
+                    <form class="mt-4 flex gap-2" @submit.prevent="manualCheckIn()">
 
-                        <input type="text" x-model="manualValue" placeholder="RogerVivier:TOKEN"
+                        <input type="text" x-model="manualValue" placeholder="guest00001" autocomplete="off"
+                            autocapitalize="none" spellcheck="false"
                             class="min-w-0
-                                   flex-1
-                                   rounded-lg
-                                   border-gray-300
-                                   text-sm">
+                       flex-1
+                       rounded-lg
+                       border-gray-300
+                       font-mono
+                       text-sm">
 
-                        <button type="submit"
+                        <button type="submit" :disabled="processing"
                             class="rounded-lg
-                                   bg-gray-900
-                                   px-4 py-2
-                                   text-sm
-                                   font-medium
-                                   text-white">
-                            Check
+                       bg-gray-900
+                       px-4 py-2
+                       text-sm
+                       font-medium
+                       text-white
+                       disabled:opacity-50">
+
+                            <span x-show="!processing">
+                                Check
+                            </span>
+
+                            <span x-show="processing" x-cloak>
+                                Checking...
+                            </span>
+
                         </button>
 
                     </form>
@@ -360,14 +369,12 @@
                         await this.startScanner();
 
                     } catch (error) {
+                        console.error('CAMERA ERROR:', error);
 
-                        console.error(error);
+                        this.scannerReady = false;
 
                         this.scannerMessage =
-                            'Camera tidak dapat diakses.';
-
-                        this.scannerReady =
-                            false;
+                            `${error.name ?? 'Error'}: ${error.message ?? error}`;
                     }
                 },
 
