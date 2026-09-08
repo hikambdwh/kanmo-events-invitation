@@ -23,4 +23,20 @@ class Event extends Model
     {
         return $this->hasMany(Invitation::class);
     }
+
+    public function activeDesign()
+    {
+        return $this->hasOne(EventDesign::class)
+            ->where('is_active', true);
+    }
+
+    public function exports()
+    {
+        return $this->hasMany(Export::class);
+    }
+
+    public function design()
+    {
+        return $this->hasOne(EventDesign::class);
+    }
 }

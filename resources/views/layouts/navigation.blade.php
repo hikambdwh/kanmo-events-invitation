@@ -13,13 +13,13 @@
                 <!-- Navigation Links -->
                 <div class="hidden space-x-8 sm:-my-px sm:ms-10 sm:flex">
 
-                    <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">
-                        {{ __('Dashboard') }}
-                    </x-nav-link>
-
                     @if (auth()->user()->isAdmin())
                         <x-nav-link :href="route('admin.events.index')" :active="request()->routeIs('admin.events.*')">
                             {{ __('Events') }}
+                        </x-nav-link>
+
+                        <x-nav-link :href="route('staff.scanner')" :active="request()->routeIs('staff.scanner')">
+                            {{ __('Scanner') }}
                         </x-nav-link>
                     @endif
 

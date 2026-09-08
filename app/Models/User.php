@@ -56,4 +56,13 @@ class User extends Authenticatable
     {
         return $this->role === 'staff';
     }
+
+    public function canScan(): bool
+    {
+        return in_array(
+            $this->role,
+            ['admin', 'staff'],
+            true
+        );
+    }
 }
