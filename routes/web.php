@@ -41,6 +41,9 @@ Route::middleware(['auth', 'admin',])->prefix('admin')->name('admin.')->group(fu
     Route::post('/events/{event}/exports/design/start', [InvitationExportController::class, 'startDesign',])
         ->name('events.exports.design.start');
     Route::post('/events/{event}/exports/{export}/design/process', [InvitationExportController::class, 'processDesign',])->name('events.exports.design.process');
+    Route::patch('/events/{event}/invitations/{invitation}/mark-scanned',[InvitationController::class,'markAsScanned'])->name('events.invitations.mark-scanned');
+    Route::patch('/events/{event}/invitations/{invitation}/reset',[InvitationController::class,'reset'])
+    ->name('events.invitations.reset');
 });
 
 Route::middleware(['auth','scanner',])->prefix('staff')->name('staff.')->group(function () {

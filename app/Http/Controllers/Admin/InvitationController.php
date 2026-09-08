@@ -160,4 +160,63 @@ class InvitationController extends Controller
                     ' invitation berhasil digenerate.'
             );
     }
+
+    public function markAsScanned(
+        Event $event,
+        Invitation $invitation
+    ): RedirectResponse {
+        abort_unless(
+            $invitation->event_id === $event->id,
+            404
+        );
+
+        if ($invitation->checked_in_at) {
+            return back()->with(
+                'info',
+                $invitation->guest_code
+                    . ' sudah berstatus scanned.'
+            );
+        }
+
+        $invitation->update([
+            'checked_in_at' => now(),
+            'checked_in_by' => auth()->id(),
+        ]);
+
+        return back()->with(
+            'success',
+            $invitation->guest_code
+                . ' berhasil ditandai sebagai scanned.'
+        );
+    }
+
+
+    public function reset(
+        Event $event,
+        Invitation $invitation
+    ): RedirectResponse {
+        abort_unless(
+            $invitation->event_id === $event->id,
+            404
+        );
+
+        if (!$invitation->checked_in_at) {
+            return back()->with(
+                'info',
+                $invitation->guest_code
+                    . ' masih berstatus available.'
+            );
+        }
+
+        $invitation->update([
+            'checked_in_at' => null,
+            'checked_in_by' => null,
+        ]);
+
+        return back()->with(
+            'success',
+            $invitation->guest_code
+                . ' berhasil di-reset dan dapat digunakan kembali.'
+        );
+    }
 }

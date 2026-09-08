@@ -272,7 +272,7 @@
 
                                 <th
                                     class="px-6 py-4
-                                           text-left
+                                           text-center
                                            text-xs
                                            font-semibold
                                            uppercase
@@ -283,7 +283,7 @@
 
                                 <th
                                     class="px-6 py-4
-                                           text-left
+                                           text-center
                                            text-xs
                                            font-semibold
                                            uppercase
@@ -294,7 +294,7 @@
 
                                 <th
                                     class="px-6 py-4
-                                           text-left
+                                           text-center
                                            text-xs
                                            font-semibold
                                            uppercase
@@ -305,7 +305,7 @@
 
                                 <th
                                     class="px-6 py-4
-                                           text-left
+                                           text-center
                                            text-xs
                                            font-semibold
                                            uppercase
@@ -316,13 +316,24 @@
 
                                 <th
                                     class="px-6 py-4
-                                           text-left
+                                           text-center
                                            text-xs
                                            font-semibold
                                            uppercase
                                            tracking-wider
                                            text-gray-500">
                                     Check In
+                                </th>
+
+                                <th
+                                    class="px-6 py-4
+                                            text-center
+                                            text-xs
+                                            font-semibold
+                                            uppercase
+                                            tracking-wider
+                                            text-gray-500">
+                                    Action
                                 </th>
 
                             </tr>
@@ -437,6 +448,72 @@
                                         @else
                                             -
                                         @endif
+
+                                    </td>
+
+                                    {{-- Action --}}
+                                    <td class="whitespace-nowrap px-6 py-5">
+
+                                        <div class="flex items-center gap-2">
+
+                                            {{-- Reset --}}
+                                            <form method="POST"
+                                                action="{{ route('admin.events.invitations.reset', [$event, $invitation]) }}"
+                                                onsubmit="
+                return confirm(
+                    'Reset {{ $invitation->guest_code }}? QR ini akan dapat digunakan kembali.'
+                )
+            ">
+                                                @csrf
+                                                @method('PATCH')
+
+                                                <button type="submit" @disabled(!$invitation->is_checked_in)
+                                                    class="rounded-lg
+                       border border-red-200
+                       px-3 py-2
+                       cursor-pointer
+                       text-xs font-medium
+                       text-red-600
+                       transition
+                       hover:bg-red-50
+                       disabled:cursor-not-allowed
+                       disabled:border-gray-200
+                       disabled:text-gray-300
+                       disabled:hover:bg-transparent">
+                                                    Reset
+                                                </button>
+                                            </form>
+
+
+                                            {{-- Mark As Scanned --}}
+                                            <form method="POST"
+                                                action="{{ route('admin.events.invitations.mark-scanned', [$event, $invitation]) }}"
+                                                onsubmit="
+                return confirm(
+                    'Tandai {{ $invitation->guest_code }} sebagai scanned?'
+                )
+            ">
+                                                @csrf
+                                                @method('PATCH')
+
+                                                <button type="submit" @disabled($invitation->is_checked_in)
+                                                    class="rounded-lg border-2
+                                                        border border-green-200
+                                                        px-3 py-2
+                                                        text-xs font-medium
+                                                        text-green-600
+                                                        cursor-pointer
+                                                        transition
+                                                        hover:bg-green-50
+                                                        disabled:cursor-not-allowed
+                                                        disabled:border-green-700
+                                                        disabled:bg-green-700
+                                                        disabled:text-white">
+                                                    Mark as Scanned
+                                                </button>
+                                            </form>
+
+                                        </div>
 
                                     </td>
 
