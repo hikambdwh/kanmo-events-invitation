@@ -70,7 +70,7 @@
                         </h3>
 
                         <p class="mt-1 text-sm text-gray-500">
-                            PNG atau JPG. Maksimal 10 MB.
+                            PNG or JPG. Max 10 MB.
                         </p>
                     </div>
 
@@ -112,9 +112,9 @@
                         </label>
 
                         <button type="submit"
-                            class="shrink-0 rounded-xl bg-gray-900
+                            class="shrink-0 rounded-xl cursor-pointer bg-[#f94242] hover:bg-[#c53434]
                    px-5 py-3 text-sm font-medium
-                   text-white transition hover:bg-black">
+                   text-white transition">
                             Upload
                         </button>
                     </div>
@@ -167,7 +167,7 @@
                                 </h3>
 
                                 <p class="mt-1 text-xs text-gray-500">
-                                    Drag QR untuk mengubah posisi.
+                                    Drag the QR to change the position.
                                 </p>
                             </div>
 
@@ -216,10 +216,10 @@
                            select-none border-2
                            border-blue-500 shadow-lg"
                                         :style="`
-                                                                                                                                                                                        left: ${x * 100}%;
-                                                                                                                                                                                        top: ${y * 100}%;
-                                                                                                                                                                                        width: ${size * 100}%;
-                                                                                                                                                                                    `">
+                                                                                                                                                                                                                                left: ${x * 100}%;
+                                                                                                                                                                                                                                top: ${y * 100}%;
+                                                                                                                                                                                                                                width: ${size * 100}%;
+                                                                                                                                                                                                                            `">
 
                                 </div>
 
@@ -393,14 +393,13 @@
 
 
                             <button type="submit"
-                                class="w-full
+                                class="w-full cursor-pointer
                                        rounded-lg
-                                       bg-gray-900
+                                       bg-[#f94242] hover:bg-[#c53434]
                                        px-4 py-3
                                        text-sm
                                        font-medium
-                                       text-white
-                                       hover:bg-black">
+                                       text-white">
                                 Save Design
                             </button>
 
@@ -414,7 +413,7 @@
 
                             <button type="button" @click="startExport()" :disabled="processing"
                                 class="w-full rounded-lg
-               border border-gray-900
+               border border-[#f94242] cursor-pointer
                bg-white
                px-4 py-3
                text-sm font-medium
@@ -440,64 +439,34 @@
 
                             <div x-show="processing" x-cloak class="mt-4">
 
-                                <div
-                                    class="h-2 overflow-hidden
-                   rounded-full
-                   bg-gray-100">
-
-                                    <div class="h-full
-                       bg-gray-900
-                       transition-all"
-                                        :style="`width: ${progress}%`"></div>
+                                <div class="h-2 overflow-hidden rounded-full bg-gray-100">
+                                    <div class="h-full bg-[#f94242] transition-all" :style="`width: ${progress}%`">
+                                    </div>
 
                                 </div>
 
-                                <div
-                                    class="mt-2
-                   flex justify-between
-                   text-xs
-                   text-gray-500">
-
-                                    <span
-                                        x-text="
-                    processed
-                    + ' / '
-                    + total
-                "></span>
-
-                                    <span x-text="
-                    progress + '%'
-                "></span>
-
+                                <div class="mt-2 flex justify-between text-xs text-gray-500">
+                                    <span x-text="processed + ' / ' + total"></span>
+                                    <span x-text="progress + '%'"></span>
                                 </div>
-
                             </div>
 
 
                             {{-- Completed --}}
 
-                            <div x-show="
-            status === 'completed'
-        " x-cloak
-                                class="mt-4 rounded-lg
-               border border-green-200
-               bg-green-50 p-4">
-
-                                <p class="text-sm
-                   font-medium
-                   text-green-700">
-                                    Export berhasil.
+                            <div x-show="status === 'completed'" x-cloak
+                                class="mt-4 rounded-lg border border-green-200 bg-green-50 p-4">
+                                <p class="text-sm font-medium text-green-700">
+                                    Export Completed.
                                 </p>
-
-
                                 <a :href="downloadUrl"
                                     class="mt-3 block
-                   rounded-lg
-                   bg-gray-900
-                   px-4 py-2.5
-                   text-center
-                   text-sm font-medium
-                   text-white">
+                                    rounded-lg
+                                    bg-[#f94242] hover:bg-[#c53434] cursor-pointer
+                                    px-4 py-2.5
+                                    text-center
+                                    text-sm font-medium
+                                    text-white">
                                     Download ZIP
                                 </a>
 
@@ -508,27 +477,20 @@
 
                             <div x-show="error" x-cloak
                                 class="mt-4 rounded-lg
-               border border-red-200
-               bg-red-50 p-4">
+                                    border border-red-200
+                                    bg-red-50 p-4">
 
-                                <p class="text-sm
-                   text-red-600" x-text="error"></p>
-
-
+                                <p class="text-smtext-red-600" x-text="error"></p>
                                 <button type="button" @click="continueExport()"
                                     class="mt-3
-                   text-sm
-                   font-medium
-                   text-red-700">
+                                            text-sm
+                                            font-medium
+                                            text-red-700">
                                     Try Again
                                 </button>
-
                             </div>
-
                         </div>
-
                     </div>
-
                 </div>
             @else
                 <div
@@ -552,358 +514,4 @@
         </div>
 
     </div>
-    <script>
-        window.designExport = function(config) {
-
-            return {
-
-                processing: false,
-
-                status: null,
-
-                processed: 0,
-
-                total: 0,
-
-                progress: 0,
-
-                processUrl: null,
-
-                downloadUrl: null,
-
-                error: null,
-
-
-                async startExport() {
-
-                    if (this.processing) {
-                        return;
-                    }
-
-                    this.error = null;
-                    this.processing = true;
-
-
-                    try {
-
-                        const response =
-                            await fetch(
-                                config.startUrl, {
-                                    method: 'POST',
-
-                                    headers: {
-                                        'Accept': 'application/json',
-
-                                        'Content-Type': 'application/json',
-
-                                        'X-CSRF-TOKEN': config.csrf,
-                                    },
-                                }
-                            );
-
-
-                        const data =
-                            await response.json();
-
-
-                        if (!response.ok) {
-
-                            throw new Error(
-                                data.message ??
-                                'Gagal memulai export.'
-                            );
-                        }
-
-
-                        this.apply(data);
-
-
-                        if (
-                            this.status !==
-                            'completed'
-                        ) {
-                            await this.processLoop();
-                        }
-
-
-                    } catch (error) {
-
-                        this.error =
-                            error.message;
-
-                        this.processing =
-                            false;
-                    }
-                },
-
-
-                async processLoop() {
-
-                    while (
-                        this.status ===
-                        'processing'
-                    ) {
-
-                        try {
-
-                            const response =
-                                await fetch(
-                                    this.processUrl, {
-                                        method: 'POST',
-
-                                        headers: {
-                                            'Accept': 'application/json',
-
-                                            'Content-Type': 'application/json',
-
-                                            'X-CSRF-TOKEN': config.csrf,
-                                        },
-                                    }
-                                );
-
-
-                            if (
-                                response.status ===
-                                409
-                            ) {
-
-                                await this.sleep(1000);
-
-                                continue;
-                            }
-
-
-                            const data =
-                                await response.json();
-
-
-                            if (!response.ok) {
-
-                                throw new Error(
-                                    data.message ??
-                                    'Render batch gagal.'
-                                );
-                            }
-
-
-                            this.apply(data);
-
-                            await this.sleep(300);
-
-
-                        } catch (error) {
-
-                            this.error =
-                                error.message;
-
-                            this.processing =
-                                false;
-
-                            return;
-                        }
-                    }
-
-
-                    this.processing = false;
-                },
-
-
-                async continueExport() {
-
-                    if (
-                        !this.processUrl ||
-                        this.processing
-                    ) {
-                        return;
-                    }
-
-                    this.error = null;
-                    this.processing = true;
-
-                    await this.processLoop();
-                },
-
-
-                apply(data) {
-
-                    this.status =
-                        data.status;
-
-                    this.processed =
-                        data.processed;
-
-                    this.total =
-                        data.total;
-
-                    this.progress =
-                        data.progress;
-
-                    this.processUrl =
-                        data.process_url;
-
-                    this.downloadUrl =
-                        data.download_url;
-
-                    this.error = null;
-                },
-
-
-                sleep(ms) {
-
-                    return new Promise(
-                        resolve =>
-                        setTimeout(
-                            resolve,
-                            ms
-                        )
-                    );
-                },
-
-            };
-        };
-    </script>
-
-    <script>
-        window.invitationDesigner = function(config) {
-
-            return {
-
-                previewValue: config.previewValue,
-
-                x: Number(config.x),
-
-                y: Number(config.y),
-
-                size: Number(config.size),
-
-                foreground: config.foreground,
-
-                background: config.background,
-
-                margin: Number(config.margin),
-
-
-                dragging: false,
-
-                pointerX: 0,
-
-                pointerY: 0,
-
-                startX: 0,
-
-                startY: 0,
-
-
-                qrUrl() {
-
-                    return (
-                        'https://api.qrserver.com/v1/create-qr-code/' +
-                        '?size=600x600' +
-                        '&data=' +
-                        encodeURIComponent(
-                            this.previewValue
-                        ) +
-                        '&color=' +
-                        this.foreground +
-                        '&bgcolor=' +
-                        this.background +
-                        '&margin=' +
-                        this.margin
-                    );
-                },
-
-
-                startDrag(event) {
-
-                    this.dragging = true;
-
-                    this.pointerX =
-                        event.clientX;
-
-                    this.pointerY =
-                        event.clientY;
-
-                    this.startX =
-                        this.x;
-
-                    this.startY =
-                        this.y;
-                },
-
-
-                moveDrag(event) {
-
-                    if (!this.dragging) {
-                        return;
-                    }
-
-                    const rect =
-                        this.$refs
-                        .canvas
-                        .getBoundingClientRect();
-
-
-                    const deltaX =
-                        (
-                            event.clientX -
-                            this.pointerX
-                        ) /
-                        rect.width;
-
-
-                    const deltaY =
-                        (
-                            event.clientY -
-                            this.pointerY
-                        ) /
-                        rect.height;
-
-
-                    let newX =
-                        this.startX +
-                        deltaX;
-
-                    let newY =
-                        this.startY +
-                        deltaY;
-
-
-                    const qrHeightRatio =
-                        (
-                            rect.width *
-                            this.size
-                        ) /
-                        rect.height;
-
-
-                    newX = Math.max(
-                        0,
-                        Math.min(
-                            1 - this.size,
-                            newX
-                        )
-                    );
-
-
-                    newY = Math.max(
-                        0,
-                        Math.min(
-                            1 - qrHeightRatio,
-                            newY
-                        )
-                    );
-
-
-                    this.x = newX;
-                    this.y = newY;
-                },
-
-
-                endDrag() {
-                    this.dragging = false;
-                },
-            };
-        };
-    </script>
-
 </x-app-layout>

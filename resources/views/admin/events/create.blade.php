@@ -45,9 +45,8 @@
 
                         <button
                             type="submit"
-                            class="rounded-lg bg-gray-900 px-5 py-3
-                                   text-sm font-medium text-white
-                                   hover:bg-black"
+                            class="rounded-lg bg-[#f94242] cursor-pointer hover:bg-[#c53434] px-5 py-3
+                                   text-sm font-medium text-white"
                         >
                             Create Event
                         </button>

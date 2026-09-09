@@ -16,13 +16,7 @@
             <div class="flex gap-3">
 
                 <a href="{{ route('admin.events.invitations.index', $event) }}"
-                    class="rounded-lg
-               bg-gray-900
-               px-4 py-2.5
-               text-sm
-               font-medium
-               text-white
-               hover:bg-black">
+                    class="rounded-lg bg-[#f94242] hover:bg-[#c53434] px-4 py-2.5 text-sm font-medium cursor-pointer text-white">
                     Manage Invitations
                 </a>
 
@@ -227,7 +221,7 @@
                                                     class="rounded-full bg-green-50
                                                            px-3 py-1 text-xs font-medium
                                                            text-green-700">
-                                                    Checked In
+                                                    Scanned
                                                 </span>
 
                                                 <p class="mt-1 text-xs text-gray-400">

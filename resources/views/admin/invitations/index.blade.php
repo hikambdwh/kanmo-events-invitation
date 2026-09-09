@@ -41,11 +41,7 @@
                         required>
 
                     <button type="submit"
-                        class="rounded-lg bg-gray-900
-                   px-4 py-2.5
-                   text-sm font-medium
-                   text-white
-                   hover:bg-black">
+                        class="rounded-lg cursor-pointer bg-[#f94242] hover:bg-[#c53434] px-4 py-2.5 text-sm font-medium text-white">
                         Generate
                     </button>
                 </form>
@@ -54,7 +50,7 @@
                 <button x-data type="button" @click="$dispatch('open-download-modal')"
                     class="rounded-lg border border-gray-300 bg-white
            px-4 py-2.5 text-sm font-medium text-gray-700
-           hover:bg-gray-50">
+           hover:bg-gray-50 cursor-pointer">
                     Download
                 </button>
 
@@ -176,401 +172,173 @@
                        bg-white p-5
                        shadow-sm">
 
-                <form method="GET" action="{{ route('admin.events.invitations.index', $event) }}"
-                    class="flex flex-col gap-3
-                           sm:flex-row">
-
-                    <div class="flex-1">
-
-                        <input type="text" name="search" value="{{ $search }}"
-                            placeholder="Search guest00001..."
-                            class="w-full rounded-lg
-                                   border-gray-300
-                                   text-sm
-                                   focus:border-gray-900
-                                   focus:ring-gray-900">
-
-                    </div>
-
-
-                    <div>
-
-                        <select name="status"
-                            class="w-full rounded-lg
-                                   border-gray-300
-                                   text-sm
-                                   sm:w-44
-                                   focus:border-gray-900
-                                   focus:ring-gray-900">
-
-                            <option value="">
-                                All Status
-                            </option>
-
-                            <option value="available" @selected($status === 'available')>
-                                Available
-                            </option>
-
-                            <option value="checked_in" @selected($status === 'checked_in')>
-                                Checked In
-                            </option>
-
-                        </select>
-
-                    </div>
-
-
-                    <button type="submit"
-                        class="rounded-lg
-                               bg-gray-900
-                               px-5 py-2.5
-                               text-sm
-                               font-medium
-                               text-white
-                               hover:bg-black">
-                        Filter
-                    </button>
-
-
-                    @if ($search || $status)
-                        <a href="{{ route('admin.events.invitations.index', $event) }}"
-                            class="rounded-lg
-                                   border
-                                   border-gray-300
-                                   px-5 py-2.5
-                                   text-center
-                                   text-sm
-                                   font-medium
-                                   text-gray-700
-                                   hover:bg-gray-50">
-                            Reset
-                        </a>
-                    @endif
-
-                </form>
-
-            </div>
-
-
-            {{-- Table --}}
-
-            <div
-                class="mt-6 overflow-hidden
-                       rounded-xl bg-white
-                       shadow-sm">
-
-                <div class="overflow-x-auto">
-
-                    <table
-                        class="min-w-full
-                               divide-y
-                               divide-gray-200">
-
-                        <thead class="bg-gray-50">
-
-                            <tr>
-
-                                <th
-                                    class="px-6 py-4
-                                           text-center
-                                           text-xs
-                                           font-semibold
-                                           uppercase
-                                           tracking-wider
-                                           text-gray-500">
-                                    Guest Code
-                                </th>
-
-                                <th
-                                    class="px-6 py-4
-                                           text-center
-                                           text-xs
-                                           font-semibold
-                                           uppercase
-                                           tracking-wider
-                                           text-gray-500">
-                                    QR
-                                </th>
-
-                                <th
-                                    class="px-6 py-4
-                                           text-center
-                                           text-xs
-                                           font-semibold
-                                           uppercase
-                                           tracking-wider
-                                           text-gray-500">
-                                    QR Value
-                                </th>
-
-                                <th
-                                    class="px-6 py-4
-                                           text-center
-                                           text-xs
-                                           font-semibold
-                                           uppercase
-                                           tracking-wider
-                                           text-gray-500">
-                                    Status
-                                </th>
-
-                                <th
-                                    class="px-6 py-4
-                                           text-center
-                                           text-xs
-                                           font-semibold
-                                           uppercase
-                                           tracking-wider
-                                           text-gray-500">
-                                    Check In
-                                </th>
-
-                                <th
-                                    class="px-6 py-4
-                                            text-center
-                                            text-xs
-                                            font-semibold
-                                            uppercase
-                                            tracking-wider
-                                            text-gray-500">
-                                    Action
-                                </th>
-
-                            </tr>
-
-                        </thead>
-
-
-                        <tbody
-                            class="divide-y
-                                   divide-gray-100
-                                   bg-white">
-
-                            @forelse($invitations
-                                as $invitation)
-                                <tr class="hover:bg-gray-50">
-
-                                    {{-- Guest code --}}
-
-                                    <td
-                                        class="whitespace-nowrap
-                                               px-6 py-5">
-
-                                        <span
-                                            class="font-mono
-                                                   text-sm
-                                                   font-semibold
-                                                   text-gray-900">
-                                            {{ $invitation->guest_code }}
-                                        </span>
-
-                                    </td>
-
-
-                                    {{-- QR --}}
-
-                                    <td class="px-6 py-4">
-
-                                        <a href="{{ $invitation->getQrImageUrl(800) }}" target="_blank" rel="noopener">
-
-                                            <img src="{{ $invitation->getQrImageUrl(100) }}"
-                                                alt="{{ $invitation->guest_code }}"
-                                                class="size-20
-                                                       rounded-lg
-                                                       border
-                                                       border-gray-200
-                                                       bg-white
-                                                       p-1"
-                                                loading="lazy">
-
-                                        </a>
-
-                                    </td>
-
-
-                                    {{-- QR value --}}
-
-                                    <td class="px-6 py-5">
-
-                                        <div
-                                            class="max-w-xs
-                                                   break-all
-                                                   font-mono
-                                                   text-xs
-                                                   text-gray-500">
-                                            {{ $invitation->qr_value }}
-                                        </div>
-
-                                    </td>
-
-
-                                    {{-- Status --}}
-
-                                    <td class="px-6 py-5">
-
-                                        @if ($invitation->is_checked_in)
-                                            <span
-                                                class="inline-flex
-                                                       rounded-full
-                                                       bg-green-100
-                                                       px-3 py-1
-                                                       text-xs
-                                                       font-medium
-                                                       text-green-700">
-                                                Scanned
-                                            </span>
-                                        @else
-                                            <span
-                                                class="inline-flex
-                                                       rounded
-                                                       bg-yellow-100
-                                                       px-3 py-1
-                                                       text-xs
-                                                       text-yellow-800
-                                                       font-medium">
-                                                Available
-                                            </span>
-                                        @endif
-
-                                    </td>
-
-
-                                    {{-- Checked in --}}
-
-                                    <td
-                                        class="whitespace-nowrap
-                                               px-6 py-5
-                                               text-sm
-                                               text-gray-500">
-
-                                        @if ($invitation->checked_in_at)
-                                            {{ $invitation->checked_in_at->format('d M Y H:i:s') }}
-                                        @else
-                                            -
-                                        @endif
-
-                                    </td>
-
-                                    {{-- Action --}}
-                                    <td class="whitespace-nowrap px-6 py-5">
-
-                                        <div class="flex items-center gap-2">
-
-                                            {{-- Reset --}}
-                                            <form method="POST"
-                                                action="{{ route('admin.events.invitations.reset', [$event, $invitation]) }}"
-                                                onsubmit="
-                return confirm(
-                    'Reset {{ $invitation->guest_code }}? QR ini akan dapat digunakan kembali.'
-                )
-            ">
-                                                @csrf
-                                                @method('PATCH')
-
-                                                <button type="submit" @disabled(!$invitation->is_checked_in)
-                                                    class="rounded-lg
-                       border border-red-200
-                       px-3 py-2
-                       cursor-pointer
-                       text-xs font-medium
-                       text-red-600
+                <div x-data="invitationFilter({
+                    url: '{{ route('admin.events.invitations.index', $event) }}',
+                
+                    initialSearch: @js($search),
+                    initialStatus: @js($status),
+                })" class="mt-6">
+
+                    {{-- Search & Filter --}}
+                    <div class="rounded-xl bg-white
+               p-5 shadow-sm">
+
+                        <div class="flex flex-col gap-3
+                   sm:flex-row">
+
+                            {{-- Search --}}
+                            <div class="relative flex-1">
+
+                                <input type="text" x-model="search"
+                                    @input.debounce.350ms="
+                        load()
+                    "
+                                    placeholder="Search guest00001..." autocomplete="off"
+                                    class="w-full rounded-lg
+                           border-gray-300
+                           pr-10
+                           text-sm
+                           focus:border-[#f94242]
+                           focus:ring-[#f94242]">
+
+
+                                {{-- Loading spinner --}}
+                                <div x-show="loading" x-cloak
+                                    class="absolute
+                           right-3 top-1/2
+                           -translate-y-1/2">
+
+                                    <svg class="size-4
+                               animate-spin
+                               text-gray-400"
+                                        viewBox="0 0 24 24" fill="none">
+                                        <circle class="opacity-25" cx="12" cy="12" r="10"
+                                            stroke="currentColor" stroke-width="4" />
+
+                                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0
+                               018-8v4a4 4
+                               0 00-4 4H4z" />
+                                    </svg>
+
+                                </div>
+
+                            </div>
+
+
+                            {{-- Status --}}
+                            <div>
+
+                                <select x-model="status" @change="load()"
+                                    class="w-full rounded-lg
+                           border-gray-300
+                           text-sm
+                           sm:w-44
+                           focus:border-[#f94242]
+                           focus:ring-[#f94242]">
+
+                                    <option value="">
+                                        All Status
+                                    </option>
+
+                                    <option value="available">
+                                        Available
+                                    </option>
+
+                                    <option value="checked_in">
+                                        Scanned
+                                    </option>
+
+                                </select>
+
+                            </div>
+
+
+                            {{-- Reset --}}
+                            <button type="button"
+                                x-show="
+                    search !== ''
+                    || status !== ''
+                "
+                                x-cloak @click="reset()"
+                                class="rounded-lg
+                       border border-gray-300
+                       px-5 py-2.5
+                       text-sm font-medium
+                       text-gray-700
                        transition
-                       hover:bg-red-50
-                       disabled:cursor-not-allowed
-                       disabled:border-gray-200
-                       disabled:text-gray-300
-                       disabled:hover:bg-transparent">
-                                                    Reset
-                                                </button>
-                                            </form>
+                       hover:bg-gray-50
+                       cursor-pointer">
+                                Reset
+                            </button>
+
+                        </div>
+
+                    </div>
 
 
-                                            {{-- Mark As Scanned --}}
-                                            <form method="POST"
-                                                action="{{ route('admin.events.invitations.mark-scanned', [$event, $invitation]) }}"
-                                                onsubmit="
-                return confirm(
-                    'Tandai {{ $invitation->guest_code }} sebagai scanned?'
-                )
-            ">
-                                                @csrf
-                                                @method('PATCH')
+                    {{-- AJAX result --}}
+                    <div class="relative mt-6" @click="
+            handlePagination($event)
+        ">
 
-                                                <button type="submit" @disabled($invitation->is_checked_in)
-                                                    class="rounded-lg border-2
-                                                        border border-green-200
-                                                        px-3 py-2
-                                                        text-xs font-medium
-                                                        text-green-600
-                                                        cursor-pointer
-                                                        transition
-                                                        hover:bg-green-50
-                                                        disabled:cursor-not-allowed
-                                                        disabled:border-green-700
-                                                        disabled:bg-green-700
-                                                        disabled:text-white">
-                                                    Mark as Scanned
-                                                </button>
-                                            </form>
+                        {{-- Loading overlay --}}
+                        <div x-show="loading" x-cloak
+                            class="absolute inset-0
+                   z-20 flex
+                   items-start
+                   justify-center
+                   rounded-xl
+                   bg-white/60
+                   pt-20
+                   backdrop-blur-[1px]">
 
-                                        </div>
+                            <div
+                                class="flex items-center
+                       gap-2
+                       rounded-lg
+                       bg-white
+                       px-4 py-3
+                       text-sm
+                       text-gray-600
+                       shadow">
 
-                                    </td>
+                                <svg class="size-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10"
+                                        stroke="currentColor" stroke-width="4" />
 
-                                </tr>
+                                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0
+                           018-8v4a4 4
+                           0 00-4 4H4z" />
+                                </svg>
+
+                                Loading...
+
+                            </div>
+
+                        </div>
 
 
-                            @empty
+                        <div x-ref="results">
 
-                                <tr>
+                            @include('admin.invitations._table', [
+                                'event' => $event,
+                                'invitations' => $invitations,
+                            ])
 
-                                    <td colspan="5"
-                                        class="px-6 py-16
-                                               text-center">
+                        </div>
 
-                                        <p
-                                            class="font-medium
-                                                   text-gray-700">
-                                            Invitation tidak ditemukan.
-                                        </p>
-
-                                        <p
-                                            class="mt-1
-                                                   text-sm
-                                                   text-gray-500">
-                                            Generate invitation
-                                            atau ubah filter.
-                                        </p>
-
-                                    </td>
-
-                                </tr>
-                            @endforelse
-
-                        </tbody>
-
-                    </table>
+                    </div>
 
                 </div>
 
             </div>
-
-
-            {{-- Pagination --}}
-
-            <div class="mt-6">
-
-                {{ $invitations->links() }}
-
-            </div>
-
         </div>
 
         <div x-data="qrExport({
             startUrl: '{{ route('admin.events.exports.qr.start', $event) }}',
             csrf: '{{ csrf_token() }}'
-        })" @open-download-modal.window="downloadModal = true" x-show="downloadModal" x-cloak
-            @keydown.escape.window="downloadModal = false"
+        })" @open-download-modal.window="downloadModal = true" x-show="downloadModal"
+            x-cloak @keydown.escape.window="downloadModal = false"
             class="fixed inset-0 z-50
            flex items-center justify-center
            p-4">
@@ -619,18 +387,7 @@
 
                     {{-- QR Only --}}
                     <button type="button" @click="startExport()" :disabled="processing"
-                        class="flex w-full
-           items-center
-           justify-between
-           rounded-xl
-           border border-gray-200
-           p-5
-           text-left
-           transition
-           hover:border-gray-900
-           hover:bg-gray-50
-           disabled:cursor-wait
-           disabled:opacity-60">
+                        class="flex w-full cursor-pointer items-center justify-between rounded-xl border border-gray-200 p-5 text-left transition hover:border-[#f94242] hover:bg-red-50 disabled:cursor-wait disabled:opacity-60">
                         <div>
 
                             <p class="font-medium text-gray-900">
@@ -647,8 +404,7 @@
 
                             <p class="mt-1 text-sm
                    text-gray-500">
-                                Download seluruh QR
-                                dalam satu file ZIP.
+                                Download all QR codes in a single ZIP file.
                             </p>
 
                         </div>
@@ -691,7 +447,7 @@
                                     </p>
 
                                     <p class="text-sm
-                           text-gray-500"
+                           text-black"
                                         x-text="
                         processed
                         + ' / '
@@ -708,7 +464,7 @@
                        bg-gray-100">
 
                                     <div class="h-full
-                           bg-gray-900
+                           bg-[#f94242]
                            transition-all
                            duration-300"
                                         :style="`width: ${progress}%`">
@@ -751,13 +507,7 @@
 
 
                                 <a :href="downloadUrl"
-                                    class="rounded-lg
-                       bg-gray-900
-                       px-4 py-2.5
-                       text-sm
-                       font-medium
-                       text-white
-                       hover:bg-black">
+                                    class="rounded-lg bg-[#f94242] hover:bg-[#c53434] px-4 py-2.5 text-sm font-medium text-white">
                                     Download ZIP
                                 </a>
 
@@ -793,28 +543,15 @@
 
                     {{-- With Design --}}
                     <a href="{{ route('admin.events.design.edit', $event) }}"
-                        class="flex w-full
-           items-center
-           justify-between
-           rounded-xl
-           border
-           border-gray-200
-           p-5
-           text-left
-           transition
-           hover:border-gray-900
-           hover:bg-gray-50">
+                        class="flex w-full cursor-pointer items-center justify-between rounded-xl border border-gray-200 p-5 text-left transition hover:border-[#f94242] hover:bg-red-50 disabled:cursor-wait disabled:opacity-60">
                         <div>
 
-                            <p class="font-medium
-                   text-gray-900">
+                            <p class="font-medium text-gray-900">
                                 With Design
                             </p>
 
-                            <p class="mt-1 text-sm
-                   text-gray-500">
-                                Apply QR ke invitation card
-                                sebelum export.
+                            <p class="mt-1 text-sm text-gray-500">
+                                Apply QR to your invitation card before download.
                             </p>
 
                         </div>
@@ -848,5 +585,286 @@
         </div>
 
     </div>
+
+    <script>
+    window.invitationFilter =
+        function (config) {
+
+            return {
+
+                search:
+                    config.initialSearch ?? '',
+
+                status:
+                    config.initialStatus ?? '',
+
+                loading:
+                    false,
+
+                controller:
+                    null,
+
+
+                async load(
+                    pageUrl = null
+                ) {
+
+                    /*
+                     * Cancel request sebelumnya.
+                     *
+                     * Misalnya user mengetik cepat:
+                     *
+                     * guest0
+                     * guest00
+                     * guest000
+                     *
+                     * kita hanya peduli request
+                     * terakhir.
+                     */
+                    if (this.controller) {
+                        this.controller.abort();
+                    }
+
+
+                    this.controller =
+                        new AbortController();
+
+
+                    this.loading = true;
+
+
+                    try {
+
+                        let url;
+
+
+                        /*
+                         * Pagination mengirim URL
+                         * sendiri.
+                         */
+                        if (pageUrl) {
+
+                            url = new URL(
+                                pageUrl,
+                                window.location.origin
+                            );
+
+                        } else {
+
+                            url = new URL(
+                                config.url,
+                                window.location.origin
+                            );
+
+                        }
+
+
+                        /*
+                         * Selalu sinkronkan
+                         * search & status terbaru.
+                         */
+                        if (
+                            this.search.trim()
+                            !== ''
+                        ) {
+
+                            url.searchParams.set(
+                                'search',
+                                this.search.trim()
+                            );
+
+                        } else {
+
+                            url.searchParams.delete(
+                                'search'
+                            );
+                        }
+
+
+                        if (
+                            this.status !== ''
+                        ) {
+
+                            url.searchParams.set(
+                                'status',
+                                this.status
+                            );
+
+                        } else {
+
+                            url.searchParams.delete(
+                                'status'
+                            );
+                        }
+
+
+                        /*
+                         * Kalau bukan pagination,
+                         * selalu kembali ke page 1.
+                         */
+                        if (!pageUrl) {
+                            url.searchParams.delete(
+                                'page'
+                            );
+                        }
+
+
+                        const response =
+                            await fetch(
+                                url.toString(),
+                                {
+                                    headers: {
+                                        'Accept':
+                                            'application/json',
+
+                                        'X-Requested-With':
+                                            'XMLHttpRequest',
+                                    },
+
+                                    signal:
+                                        this.controller
+                                            .signal,
+                                }
+                            );
+
+
+                        if (!response.ok) {
+                            throw new Error(
+                                'Gagal mengambil invitation.'
+                            );
+                        }
+
+
+                        const data =
+                            await response.json();
+
+
+                        /*
+                         * Replace table HTML.
+                         */
+                        this.$refs
+                            .results
+                            .innerHTML =
+                                data.html;
+
+
+                        /*
+                         * Update URL browser
+                         * tanpa reload.
+                         */
+                        window.history
+                            .replaceState(
+                                {},
+                                '',
+                                url.pathname
+                                + url.search
+                            );
+
+
+                    } catch (error) {
+
+                        /*
+                         * AbortError normal terjadi
+                         * ketika user mengetik cepat.
+                         */
+                        if (
+                            error.name
+                            !== 'AbortError'
+                        ) {
+
+                            console.error(
+                                'Invitation search error:',
+                                error
+                            );
+                        }
+
+                    } finally {
+
+                        this.loading =
+                            false;
+
+                    }
+                },
+
+
+                /*
+                 * Reset filter.
+                 */
+                reset() {
+
+                    this.search = '';
+
+                    this.status = '';
+
+                    this.load();
+                },
+
+
+                /*
+                 * AJAX pagination.
+                 */
+                handlePagination(event) {
+
+                    const link =
+                        event.target.closest(
+                            'a'
+                        );
+
+
+                    if (!link) {
+                        return;
+                    }
+
+
+                    /*
+                     * Hanya intercept link pagination.
+                     */
+                    const pagination =
+                        link.closest(
+                            'nav'
+                        );
+
+
+                    if (!pagination) {
+                        return;
+                    }
+
+
+                    const href =
+                        link.getAttribute(
+                            'href'
+                        );
+
+
+                    if (!href) {
+                        return;
+                    }
+
+
+                    event.preventDefault();
+
+
+                    this.load(
+                        href
+                    );
+
+
+                    /*
+                     * Scroll kembali ke filter/table.
+                     */
+                    this.$el
+                        .scrollIntoView({
+                            behavior:
+                                'smooth',
+
+                            block:
+                                'start',
+                        });
+                },
+
+            };
+
+        };
+</script>
 
 </x-app-layout>

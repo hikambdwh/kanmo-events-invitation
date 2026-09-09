@@ -10,20 +10,31 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 use Illuminate\View\View;
+use Illuminate\Http\JsonResponse;
+
 
 class InvitationController extends Controller
 {
     public function index(
         Request $request,
         Event $event
-    ): View {
-        $search = trim($request->get('search', ''));
+    ): View|JsonResponse {
 
-        $status = $request->get('status');
+        $search = trim(
+            $request->get('search', '')
+        );
 
-        $invitations = $event->invitations()
+        $status = $request->get(
+            'status',
+            ''
+        );
+
+
+        $invitations = $event
+            ->invitations()
+
             ->when(
-                $search,
+                $search !== '',
                 function ($query) use ($search) {
                     $query->where(
                         'guest_code',
@@ -32,35 +43,76 @@ class InvitationController extends Controller
                     );
                 }
             )
+
             ->when(
                 $status === 'available',
                 fn($query) =>
-                $query->whereNull('checked_in_at')
+                $query->whereNull(
+                    'checked_in_at'
+                )
             )
+
             ->when(
                 $status === 'checked_in',
                 fn($query) =>
-                $query->whereNotNull('checked_in_at')
+                $query->whereNotNull(
+                    'checked_in_at'
+                )
             )
+
             ->orderBy('guest_number')
+
             ->paginate(20)
+
             ->withQueryString();
 
+
+        /*
+     * =========================================
+     * AJAX REQUEST
+     * =========================================
+     */
+        if ($request->expectsJson()) {
+
+            return response()->json([
+                'html' => view(
+                    'admin.invitations._table',
+                    [
+                        'event' => $event,
+                        'invitations' => $invitations,
+                    ]
+                )->render(),
+            ]);
+        }
+
+
+        /*
+     * =========================================
+     * NORMAL PAGE LOAD
+     * =========================================
+     */
+
         $statistics = [
+
             'total' => $event
                 ->invitations()
                 ->count(),
 
             'available' => $event
                 ->invitations()
-                ->whereNull('checked_in_at')
+                ->whereNull(
+                    'checked_in_at'
+                )
                 ->count(),
 
             'checked_in' => $event
                 ->invitations()
-                ->whereNotNull('checked_in_at')
+                ->whereNotNull(
+                    'checked_in_at'
+                )
                 ->count(),
         ];
+
 
         return view(
             'admin.invitations.index',
@@ -157,7 +209,7 @@ class InvitationController extends Controller
             ->with(
                 'success',
                 $quantity .
-                    ' invitation berhasil digenerate.'
+                ' invitations have been successfully generated.'
             );
     }
 
@@ -186,7 +238,7 @@ class InvitationController extends Controller
         return back()->with(
             'success',
             $invitation->guest_code
-                . ' berhasil ditandai sebagai scanned.'
+                . ' has been marked as scanned.'
         );
     }
 
@@ -216,7 +268,7 @@ class InvitationController extends Controller
         return back()->with(
             'success',
             $invitation->guest_code
-                . ' berhasil di-reset dan dapat digunakan kembali.'
+                . ' has been reset and can be used again.'
         );
     }
 }

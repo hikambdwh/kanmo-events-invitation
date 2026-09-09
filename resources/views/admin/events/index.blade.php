@@ -15,8 +15,8 @@
 
             <a
                 href="{{ route('admin.events.create') }}"
-                class="rounded-lg bg-gray-900 px-4 py-2.5
-                       text-sm font-medium text-white hover:bg-black"
+                class="rounded-lg bg-[#f94242] px-4 py-2.5
+                       text-sm font-medium cursor-pointer text-white hover:bg-[#c53434]"
             >
                 Create Event
             </a>
@@ -68,7 +68,7 @@
 
                                 <th class="px-6 py-4 text-center text-xs font-semibold
                                            uppercase tracking-wider text-gray-500">
-                                    Checked In
+                                    Scanned
                                 </th>
 
                                 <th class="px-6 py-4"></th>
@@ -152,9 +152,9 @@
 
                                         <a
                                             href="{{ route('admin.events.create') }}"
-                                            class="mt-5 inline-block rounded-lg bg-gray-900
-                                                   px-4 py-2.5 text-sm font-medium
-                                                   text-white hover:bg-black"
+                                            class="mt-5 inline-block rounded-lg bg-[#f94242] hover:bg-[#c53434]
+                                                   px-4 py-2.5 text-sm cursor-pointer font-medium
+                                                   text-white "
                                         >
                                             Create Event
                                         </a>

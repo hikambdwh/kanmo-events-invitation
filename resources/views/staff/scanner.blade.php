@@ -7,7 +7,7 @@
             </h2>
 
             <p class="mt-1 text-sm text-gray-500">
-                Scan invitation QR untuk check-in.
+                Scan invitation QR to check-in.
             </p>
         </div>
     </x-slot>
@@ -18,7 +18,6 @@
         <div class="mx-auto max-w-lg
                    px-4 sm:px-6" x-data="scannerApp({
                        checkInUrl: '{{ route('staff.check-in') }}',
-                   
                        csrf: '{{ csrf_token() }}'
                    })">
 
@@ -117,7 +116,7 @@
                                    text-xl
                                    font-semibold
                                    text-amber-900">
-                            QR Sudah Check-in
+                            QR Already Scanned
                         </h3>
 
                         <p class="mt-1
@@ -217,12 +216,11 @@
                 class="mt-5
                        w-full
                        rounded-xl
-                       bg-gray-900
+                       bg-[#f94242] hover:bg-[#c53434]
                        px-5 py-3
                        text-sm
                        font-medium
-                       text-white
-                       hover:bg-black">
+                       text-white">
                 Scan Next QR
             </button>
 
@@ -304,7 +302,7 @@
                     </summary>
 
                     <p class="mt-3 text-xs text-gray-500">
-                        Masukkan guest code yang tercetak di bawah QR.
+                        Enter the guest code printed below the QR.
                     </p>
 
                     <form class="mt-4 flex gap-2" @submit.prevent="manualCheckIn()">
@@ -320,7 +318,7 @@
 
                         <button type="submit" :disabled="processing"
                             class="rounded-lg
-                       bg-gray-900
+                       bg-[#f94242] hover:bg-[#c53434] cursor-pointer
                        px-4 py-2
                        text-sm
                        font-medium
@@ -447,7 +445,7 @@
                     this.scannerReady = false;
 
                     this.scannerMessage =
-                        'Meminta akses kamera...';
+                        'Requesting for camera access';
 
 
                     const scannerConfig = {
@@ -494,7 +492,7 @@
                         this.scannerReady = true;
 
                         this.scannerMessage =
-                            'Arahkan kamera ke QR.';
+                            'Point the camera at the QR code.';
 
                         return;
 
@@ -617,7 +615,7 @@
                             this.scannerReady = true;
 
                             this.scannerMessage =
-                                'Arahkan kamera ke QR.';
+                                'Point the camera at the QR code.';
 
 
                             console.log(
@@ -1056,7 +1054,7 @@
                             true;
 
                         this.scannerMessage =
-                            'Arahkan kamera ke QR.';
+                            'Point the camera at the QR code.';
 
                         return;
 
