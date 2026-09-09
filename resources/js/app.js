@@ -1,5 +1,6 @@
 import './bootstrap';
 import './qronly';
+import './scanner';
 import './edit_design';
 import { Html5Qrcode } from 'html5-qrcode';
 
