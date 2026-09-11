@@ -4,7 +4,7 @@
     <div>
         <label
             for="name"
-            class="mb-2 block text-sm font-medium text-gray-700"
+            class="block mb-2 text-sm font-medium text-gray-700"
         >
             Event Name
         </label>
@@ -15,9 +15,7 @@
             name="name"
             value="{{ old('name', $event->name ?? '') }}"
             placeholder="Roger Vivier Invitation"
-            class="w-full rounded-lg border border-gray-300 px-4 py-3
-                   text-gray-900 outline-none transition
-                   focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
+            class="w-full px-4 py-3 text-gray-900 transition border border-gray-300 rounded-lg outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
             required
         >
 
@@ -33,7 +31,7 @@
     <div>
         <label
             for="qr_prefix"
-            class="mb-2 block text-sm font-medium text-gray-700"
+            class="block mb-2 text-sm font-medium text-gray-700"
         >
             QR Prefix
         </label>
@@ -44,9 +42,7 @@
             name="qr_prefix"
             value="{{ old('qr_prefix', $event->qr_prefix ?? '') }}"
             placeholder="RogerVivier"
-            class="w-full rounded-lg border border-gray-300 px-4 py-3
-                   text-gray-900 outline-none transition
-                   focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
+            class="w-full px-4 py-3 text-gray-900 transition border border-gray-300 rounded-lg outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
             required
         >
 
@@ -70,7 +66,7 @@
     <div>
         <label
             for="event_date"
-            class="mb-2 block text-sm font-medium text-gray-700"
+            class="block mb-2 text-sm font-medium text-gray-700"
         >
             Event Date
         </label>
@@ -87,9 +83,7 @@
                         : ''
                 )
             }}"
-            class="w-full rounded-lg border border-gray-300 px-4 py-3
-                   text-gray-900 outline-none transition
-                   focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
+            class="w-full px-4 py-3 text-gray-900 transition border border-gray-300 rounded-lg outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
         >
 
         @error('event_date')
@@ -104,7 +98,7 @@
     <div>
         <label
             for="venue"
-            class="mb-2 block text-sm font-medium text-gray-700"
+            class="block mb-2 text-sm font-medium text-gray-700"
         >
             Venue
         </label>
@@ -115,9 +109,7 @@
             name="venue"
             value="{{ old('venue', $event->venue ?? '') }}"
             placeholder="Plaza Indonesia"
-            class="w-full rounded-lg border border-gray-300 px-4 py-3
-                   text-gray-900 outline-none transition
-                   focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
+            class="w-full px-4 py-3 text-gray-900 transition border border-gray-300 rounded-lg outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
         >
 
         @error('venue')
@@ -132,7 +124,7 @@
     <div>
         <label
             for="address"
-            class="mb-2 block text-sm font-medium text-gray-700"
+            class="block mb-2 text-sm font-medium text-gray-700"
         >
             Address
         </label>
@@ -142,9 +134,7 @@
             name="address"
             rows="4"
             placeholder="Alamat event..."
-            class="w-full rounded-lg border border-gray-300 px-4 py-3
-                   text-gray-900 outline-none transition
-                   focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
+            class="w-full px-4 py-3 text-gray-900 transition border border-gray-300 rounded-lg outline-none focus:border-gray-900 focus:ring-1 focus:ring-gray-900"
         >{{ old('address', $event->address ?? '') }}</textarea>
 
         @error('address')

@@ -38,21 +38,19 @@
 
 
     <div class="py-12">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
 
             @if (session('success'))
                 <div
-                    class="mb-6 rounded-lg border border-green-200
-                           bg-green-50 px-4 py-3 text-sm text-green-700">
+                    class="px-4 py-3 mb-6 text-sm text-green-700 border border-green-200 rounded-lg bg-green-50">
                     {{ session('success') }}
                 </div>
             @endif
 
             @if ($errors->any())
                 <div
-                    class="mb-6 rounded-lg border border-red-200
-               bg-red-50 px-4 py-3 text-sm text-red-700">
-                    <ul class="list-disc space-y-1 pl-5">
+                    class="px-4 py-3 mb-6 text-sm text-red-700 border border-red-200 rounded-lg bg-red-50">
+                    <ul class="pl-5 space-y-1 list-disc">
                         @foreach ($errors->all() as $error)
                             <li>
                                 {{ $error }}
@@ -66,7 +64,7 @@
             {{-- Statistics --}}
             <div class="grid gap-4 md:grid-cols-3">
 
-                <div class="rounded-xl bg-white p-6 shadow-sm">
+                <div class="p-6 bg-white shadow-sm rounded-xl">
                     <p class="text-sm text-gray-500">
                         Total Invitations
                     </p>
@@ -77,7 +75,7 @@
                 </div>
 
 
-                <div class="rounded-xl bg-white p-6 shadow-sm">
+                <div class="p-6 bg-white shadow-sm rounded-xl">
                     <p class="text-sm text-gray-500">
                         Available
                     </p>
@@ -88,7 +86,7 @@
                 </div>
 
 
-                <div class="rounded-xl bg-white p-6 shadow-sm">
+                <div class="p-6 bg-white shadow-sm rounded-xl">
                     <p class="text-sm text-gray-500">
                         Checked In
                     </p>
@@ -101,10 +99,10 @@
             </div>
 
 
-            <div class="mt-6 grid gap-6 lg:grid-cols-3">
+            <div class="grid gap-6 mt-6 lg:grid-cols-3">
 
                 {{-- Event Information --}}
-                <div class="rounded-xl bg-white p-6 shadow-sm">
+                <div class="p-6 bg-white shadow-sm rounded-xl">
 
                     <h3 class="font-semibold text-gray-900">
                         Event Information
@@ -113,7 +111,7 @@
                     <dl class="mt-6 space-y-5">
 
                         <div>
-                            <dt class="text-xs uppercase tracking-wide text-gray-400">
+                            <dt class="text-xs tracking-wide text-gray-400 uppercase">
                                 Event Date
                             </dt>
 
@@ -124,7 +122,7 @@
 
 
                         <div>
-                            <dt class="text-xs uppercase tracking-wide text-gray-400">
+                            <dt class="text-xs tracking-wide text-gray-400 uppercase">
                                 Venue
                             </dt>
 
@@ -135,18 +133,18 @@
 
 
                         <div>
-                            <dt class="text-xs uppercase tracking-wide text-gray-400">
+                            <dt class="text-xs tracking-wide text-gray-400 uppercase">
                                 Address
                             </dt>
 
-                            <dd class="mt-1 whitespace-pre-line text-sm text-gray-800">
+                            <dd class="mt-1 text-sm text-gray-800 whitespace-pre-line">
                                 {{ $event->address ?? '-' }}
                             </dd>
                         </div>
 
 
                         <div>
-                            <dt class="text-xs uppercase tracking-wide text-gray-400">
+                            <dt class="text-xs tracking-wide text-gray-400 uppercase">
                                 QR Prefix
                             </dt>
 
@@ -167,11 +165,10 @@
                 {{-- Invitations --}}
                 <div class="lg:col-span-2">
 
-                    <div class="overflow-hidden rounded-xl bg-white shadow-sm">
+                    <div class="overflow-hidden bg-white shadow-sm rounded-xl">
 
                         <div
-                            class="flex items-center justify-between border-b
-                                    border-gray-100 px-6 py-5">
+                            class="flex items-center justify-between px-6 py-5 border-b border-gray-100">
 
                             <h3 class="font-semibold text-gray-900">
                                 Recent Invitations
@@ -198,13 +195,11 @@
 
                                 @foreach ($event->invitations as $invitation)
                                     <div
-                                        class="flex items-center justify-between
-                                                gap-4 px-6 py-4">
+                                        class="flex items-center justify-between gap-4 px-6 py-4">
 
                                         <div>
                                             <p
-                                                class="font-mono text-sm font-medium
-                                                      text-gray-900">
+                                                class="font-mono text-sm font-medium text-gray-900">
                                                 {{ $invitation->guest_code }}
                                             </p>
 
@@ -218,9 +213,7 @@
                                             <div class="text-right">
 
                                                 <span
-                                                    class="rounded-full bg-green-50
-                                                           px-3 py-1 text-xs font-medium
-                                                           text-green-700">
+                                                    class="px-3 py-1 text-xs font-medium text-green-700 rounded-full bg-green-50">
                                                     Scanned
                                                 </span>
 
@@ -231,9 +224,7 @@
                                             </div>
                                         @else
                                             <span
-                                                class="rounded-full bg-gray-100
-                                                       px-3 py-1 text-xs font-medium
-                                                       text-gray-600">
+                                                class="px-3 py-1 text-xs font-medium text-gray-600 bg-gray-100 rounded-full">
                                                 Available
                                             </span>
                                         @endif
@@ -253,7 +244,7 @@
 
 
             {{-- Danger Zone --}}
-            <div class="mt-8 rounded-xl border border-red-200 bg-white p-6">
+            <div class="p-6 mt-8 bg-white border border-red-200 rounded-xl">
 
                 <h3 class="font-semibold text-red-700">
                     Danger Zone

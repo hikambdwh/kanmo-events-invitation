@@ -26,19 +26,18 @@
 
 
     <div class="py-12">
-        <div class="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
+        <div class="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
 
             @if(session('success'))
                 <div
-                    class="mb-6 rounded-lg border border-green-200
-                           bg-green-50 px-4 py-3 text-sm text-green-700"
+                    class="px-4 py-3 mb-6 text-sm text-green-700 border border-green-200 rounded-lg bg-green-50"
                 >
                     {{ session('success') }}
                 </div>
             @endif
 
 
-            <div class="overflow-hidden rounded-xl bg-white shadow-sm">
+            <div class="overflow-hidden bg-white shadow-sm rounded-xl">
 
                 <div class="overflow-x-auto">
 
@@ -46,28 +45,23 @@
 
                         <thead class="bg-gray-50">
                             <tr>
-                                <th class="px-6 py-4 text-left text-xs font-semibold
-                                           uppercase tracking-wider text-gray-500">
+                                <th class="px-6 py-4 text-xs font-semibold tracking-wider text-left text-gray-500 uppercase">
                                     Event
                                 </th>
 
-                                <th class="px-6 py-4 text-left text-xs font-semibold
-                                           uppercase tracking-wider text-gray-500">
+                                <th class="px-6 py-4 text-xs font-semibold tracking-wider text-left text-gray-500 uppercase">
                                     Date
                                 </th>
 
-                                <th class="px-6 py-4 text-left text-xs font-semibold
-                                           uppercase tracking-wider text-gray-500">
+                                <th class="px-6 py-4 text-xs font-semibold tracking-wider text-left text-gray-500 uppercase">
                                     QR Prefix
                                 </th>
 
-                                <th class="px-6 py-4 text-center text-xs font-semibold
-                                           uppercase tracking-wider text-gray-500">
+                                <th class="px-6 py-4 text-xs font-semibold tracking-wider text-center text-gray-500 uppercase">
                                     Invitations
                                 </th>
 
-                                <th class="px-6 py-4 text-center text-xs font-semibold
-                                           uppercase tracking-wider text-gray-500">
+                                <th class="px-6 py-4 text-xs font-semibold tracking-wider text-center text-gray-500 uppercase">
                                     Scanned
                                 </th>
 
@@ -75,7 +69,7 @@
                             </tr>
                         </thead>
 
-                        <tbody class="divide-y divide-gray-100 bg-white">
+                        <tbody class="bg-white divide-y divide-gray-100">
 
                             @forelse($events as $event)
 
@@ -98,7 +92,7 @@
 
                                     </td>
 
-                                    <td class="whitespace-nowrap px-6 py-5 text-sm text-gray-600">
+                                    <td class="px-6 py-5 text-sm text-gray-600 whitespace-nowrap">
                                         {{ $event->event_date?->format('d M Y, H:i') ?? '-' }}
                                     </td>
 
@@ -113,11 +107,11 @@
 
                                     </td>
 
-                                    <td class="px-6 py-5 text-center text-sm text-gray-700">
+                                    <td class="px-6 py-5 text-sm text-center text-gray-700">
                                         {{ $event->invitations_count }}
                                     </td>
 
-                                    <td class="px-6 py-5 text-center text-sm text-gray-700">
+                                    <td class="px-6 py-5 text-sm text-center text-gray-700">
                                         {{ $event->checked_in_count }}
                                     </td>
 
@@ -125,8 +119,7 @@
 
                                         <a
                                             href="{{ route('admin.events.show', $event) }}"
-                                            class="text-sm font-medium text-gray-700
-                                                   hover:text-black"
+                                            class="text-sm font-medium text-gray-700 hover:text-black"
                                         >
                                             View
                                         </a>

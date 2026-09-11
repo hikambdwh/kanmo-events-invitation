@@ -2,23 +2,17 @@
 
     <x-slot name="header">
 
-        <div class="flex items-center
-                   justify-between">
+        <div class="flex items-center justify-between">
 
             <div>
 
                 <a href="{{ route('admin.events.invitations.index', $event) }}"
-                    class="text-sm
-                           text-gray-500
-                           hover:text-gray-900">
+                    class="text-sm text-gray-500 hover:text-gray-900">
                     ← Invitations
                 </a>
 
                 <h2
-                    class="mt-1
-                           text-xl
-                           font-semibold
-                           text-gray-900">
+                    class="mt-1 text-xl font-semibold text-gray-900">
                     Design Invitation
                 </h2>
 
@@ -31,16 +25,11 @@
 
     <div class="py-12">
 
-        <div class="mx-auto max-w-7xl
-                   px-4 sm:px-6 lg:px-8">
+        <div class="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
 
             @if (session('success'))
                 <div
-                    class="mb-6 rounded-lg
-                           border border-green-200
-                           bg-green-50
-                           px-4 py-3
-                           text-sm text-green-700">
+                    class="px-4 py-3 mb-6 text-sm text-green-700 border border-green-200 rounded-lg bg-green-50">
                     {{ session('success') }}
                 </div>
             @endif
@@ -48,17 +37,13 @@
 
             @if ($errors->any())
                 <div
-                    class="mb-6 rounded-lg
-                           border border-red-200
-                           bg-red-50
-                           px-4 py-3
-                           text-sm text-red-700">
+                    class="px-4 py-3 mb-6 text-sm text-red-700 border border-red-200 rounded-lg bg-red-50">
                     {{ $errors->first() }}
                 </div>
             @endif
 
             {{-- Upload Background --}}
-            <div class="mb-6 rounded-xl bg-white p-5 shadow-sm">
+            <div class="p-5 mb-6 bg-white shadow-sm rounded-xl">
                 <form method="POST" enctype="multipart/form-data"
                     action="{{ route('admin.events.design.background', $event) }}" x-data="{ fileName: '' }"
                     class="flex justify-between gap-4 lg:flex-row lg:items-center">
@@ -76,14 +61,9 @@
 
                     <div class="flex inline-flex items-center gap-4">
                         <label
-                            class="flex min-h-14 cursor-pointer items-center gap-3
-                   rounded-xl border max-w-fit border-dashed border-gray-300
-                   bg-gray-50 px-4 py-3 transition
-                   hover:border-gray-500 hover:bg-gray-100">
+                            class="flex items-center gap-3 px-4 py-3 transition border border-gray-300 border-dashed cursor-pointer min-h-14 rounded-xl max-w-fit bg-gray-50 hover:border-gray-500 hover:bg-gray-100">
                             <div
-                                class="flex size-10 shrink-0 items-center
-                       justify-center rounded-lg bg-white
-                       text-gray-500 shadow-sm">
+                                class="flex items-center justify-center text-gray-500 bg-white rounded-lg shadow-sm size-10 shrink-0">
                                 <svg class="size-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.8"
                                         d="M12 16V4m0 0-4 4m4-4 4 4M5 15v4a1 1 0 001 1h12a1 1 0 001-1v-4" />
@@ -92,7 +72,7 @@
 
                             <div class="min-w-0">
 
-                                <p class="truncate text-sm font-medium text-gray-700"
+                                <p class="text-sm font-medium text-gray-700 truncate"
                                     x-text="fileName || 'Choose invitation image'"></p>
 
                                 <p class="mt-0.5 text-xs text-gray-400">
@@ -155,12 +135,10 @@
        xl:grid-cols-[minmax(0,1fr)_320px]">
 
                     {{-- Canvas --}}
-                    <div class="rounded-xl bg-white shadow-sm">
+                    <div class="bg-white shadow-sm rounded-xl">
 
                         <div
-                            class="flex items-center justify-between
-               border-b border-gray-100
-               px-5 py-4">
+                            class="flex items-center justify-between px-5 py-4 border-b border-gray-100">
                             <div>
                                 <h3 class="font-semibold text-gray-900">
                                     Invitation Preview
@@ -196,11 +174,7 @@
                    p-4">
 
                                 <div x-ref="canvas"
-                                    class="relative inline-block
-                       max-w-full
-                       overflow-hidden
-                       bg-white
-                       shadow-lg">
+                                    class="relative inline-block max-w-full overflow-hidden bg-white shadow-lg">
 
                                     <img src="{{ Storage::disk('public')->url($design->background_path) }}"
                                         class="block h-auto w-auto
@@ -212,9 +186,7 @@
 
                                     <img :src="qrUrl()" @pointerdown.prevent="startDrag($event)"
                                         draggable="false"
-                                        class="absolute cursor-move
-                           select-none border-2
-                           border-blue-500 shadow-lg"
+                                        class="absolute border-2 border-blue-500 shadow-lg cursor-move select-none"
                                         :style="`
                                                                                                                                                                                                                                 left: ${x * 100}%;
                                                                                                                                                                                                                                 top: ${y * 100}%;
@@ -233,14 +205,9 @@
                     {{-- Settings --}}
 
                     <div
-                        class="rounded-xl
-           bg-white p-6
-           shadow-sm
-           xl:sticky
-           xl:top-6">
+                        class="p-6 bg-white shadow-sm rounded-xl xl:sticky xl:top-6">
 
-                        <h3 class="font-semibold
-                                   text-gray-900">
+                        <h3 class="font-semibold text-gray-900">
                             QR Settings
                         </h3>
 
@@ -269,18 +236,14 @@
 
                             <div>
 
-                                <div class="flex
-                                           justify-between">
+                                <div class="flex justify-between">
 
                                     <label
-                                        class="text-sm
-                                               font-medium
-                                               text-gray-700">
+                                        class="text-sm font-medium text-gray-700">
                                         QR Size
                                     </label>
 
-                                    <span class="text-sm
-                                               text-gray-500"
+                                    <span class="text-sm text-gray-500"
                                         x-text="
                                             Math.round(
                                                 size * 100
@@ -291,7 +254,7 @@
 
 
                                 <input type="range" min="0.05" max="0.5" step="0.005" x-model.number="size"
-                                    class="mt-3 w-full">
+                                    class="w-full mt-3">
 
                             </div>
 
@@ -301,14 +264,11 @@
                             <div>
 
                                 <label
-                                    class="text-sm
-                                           font-medium
-                                           text-gray-700">
+                                    class="text-sm font-medium text-gray-700">
                                     QR Color
                                 </label>
 
-                                <div class="mt-2 flex
-                                           items-center gap-3">
+                                <div class="flex items-center gap-3 mt-2">
 
                                     <input type="color" :value="'#' + foreground"
                                         @input="
@@ -321,9 +281,7 @@
                                         class="size-10">
 
                                     <span
-                                        class="font-mono
-                                               text-sm
-                                               text-gray-500"
+                                        class="font-mono text-sm text-gray-500"
                                         x-text="
                                             '#' + foreground
                                         "></span>
@@ -338,14 +296,11 @@
                             <div>
 
                                 <label
-                                    class="text-sm
-                                           font-medium
-                                           text-gray-700">
+                                    class="text-sm font-medium text-gray-700">
                                     QR Background
                                 </label>
 
-                                <div class="mt-2 flex
-                                           items-center gap-3">
+                                <div class="flex items-center gap-3 mt-2">
 
                                     <input type="color" :value="'#' + background"
                                         @input="
@@ -358,9 +313,7 @@
                                         class="size-10">
 
                                     <span
-                                        class="font-mono
-                                               text-sm
-                                               text-gray-500"
+                                        class="font-mono text-sm text-gray-500"
                                         x-text="
                                             '#' + background
                                         "></span>
@@ -375,18 +328,14 @@
                             <div>
 
                                 <label
-                                    class="text-sm
-                                           font-medium
-                                           text-gray-700">
+                                    class="text-sm font-medium text-gray-700">
                                     QR Margin
                                 </label>
 
                                 <input type="range" min="0" max="30" step="1"
-                                    x-model.number="margin" class="mt-3 w-full">
+                                    x-model.number="margin" class="w-full mt-3">
 
-                                <p class="mt-1
-                                           text-xs
-                                           text-gray-500"
+                                <p class="mt-1 text-xs text-gray-500"
                                     x-text="margin"></p>
 
                             </div>
@@ -439,13 +388,13 @@
 
                             <div x-show="processing" x-cloak class="mt-4">
 
-                                <div class="h-2 overflow-hidden rounded-full bg-gray-100">
+                                <div class="h-2 overflow-hidden bg-gray-100 rounded-full">
                                     <div class="h-full bg-[#f94242] transition-all" :style="`width: ${progress}%`">
                                     </div>
 
                                 </div>
 
-                                <div class="mt-2 flex justify-between text-xs text-gray-500">
+                                <div class="flex justify-between mt-2 text-xs text-gray-500">
                                     <span x-text="processed + ' / ' + total"></span>
                                     <span x-text="progress + '%'"></span>
                                 </div>
@@ -455,7 +404,7 @@
                             {{-- Completed --}}
 
                             <div x-show="status === 'completed'" x-cloak
-                                class="mt-4 rounded-lg border border-green-200 bg-green-50 p-4">
+                                class="p-4 mt-4 border border-green-200 rounded-lg bg-green-50">
                                 <p class="text-sm font-medium text-green-700">
                                     Export Completed.
                                 </p>
@@ -476,16 +425,11 @@
                             {{-- Error --}}
 
                             <div x-show="error" x-cloak
-                                class="mt-4 rounded-lg
-                                    border border-red-200
-                                    bg-red-50 p-4">
+                                class="p-4 mt-4 border border-red-200 rounded-lg bg-red-50">
 
                                 <p class="text-smtext-red-600" x-text="error"></p>
                                 <button type="button" @click="continueExport()"
-                                    class="mt-3
-                                            text-sm
-                                            font-medium
-                                            text-red-700">
+                                    class="mt-3 text-sm font-medium text-red-700">
                                     Try Again
                                 </button>
                             </div>
@@ -494,16 +438,9 @@
                 </div>
             @else
                 <div
-                    class="rounded-xl
-                           border-2
-                           border-dashed
-                           border-gray-300
-                           bg-white
-                           px-6 py-20
-                           text-center">
+                    class="px-6 py-20 text-center bg-white border-2 border-gray-300 border-dashed rounded-xl">
 
-                    <p class="font-medium
-                               text-gray-700">
+                    <p class="font-medium text-gray-700">
                         Upload invitation card
                         terlebih dahulu.
                     </p>

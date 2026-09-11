@@ -15,8 +15,7 @@
 
     <div class="py-8">
 
-        <div class="mx-auto max-w-lg
-                   px-4 sm:px-6" x-data="scannerApp({
+        <div class="max-w-lg px-4 mx-auto sm:px-6" x-data="scannerApp({
                        checkInUrl: '{{ route('staff.check-in') }}',
                        csrf: '{{ csrf_token() }}'
                    })">
@@ -31,44 +30,26 @@
                         === 'success'
                     ">
                     <div
-                        class="rounded-2xl
-                               border border-green-200
-                               bg-green-50
-                               p-6">
+                        class="p-6 border border-green-200 rounded-2xl bg-green-50">
 
                         <div
-                            class="flex size-12
-                                   items-center
-                                   justify-center
-                                   rounded-full
-                                   bg-green-100
-                                   text-2xl
-                                   text-green-700">
+                            class="flex items-center justify-center text-2xl text-green-700 bg-green-100 rounded-full size-12">
                             ✓
                         </div>
 
                         <h3
-                            class="mt-4
-                                   text-xl
-                                   font-semibold
-                                   text-green-900">
+                            class="mt-4 text-xl font-semibold text-green-900">
                             Check-in Success
                         </h3>
 
-                        <p class="mt-1
-                                   font-mono
-                                   text-lg
-                                   font-semibold
-                                   text-green-800"
+                        <p class="mt-1 font-mono text-lg font-semibold text-green-800"
                             x-text="
                                 result.guest_code
                             ">
                         </p>
 
                         <div
-                            class="mt-4
-                                   text-sm
-                                   text-green-700">
+                            class="mt-4 text-sm text-green-700">
 
                             <p
                                 x-text="
@@ -95,51 +76,32 @@
                         === 'already_checked_in'
                     ">
                     <div
-                        class="rounded-2xl
-                               border border-amber-200
-                               bg-amber-50
-                               p-6">
+                        class="p-6 border rounded-2xl border-amber-200 bg-amber-50">
 
                         <div
-                            class="flex size-12
-                                   items-center
-                                   justify-center
-                                   rounded-full
-                                   bg-amber-100
-                                   text-2xl
-                                   text-amber-700">
+                            class="flex items-center justify-center text-2xl rounded-full size-12 bg-amber-100 text-amber-700">
                             !
                         </div>
 
                         <h3
-                            class="mt-4
-                                   text-xl
-                                   font-semibold
-                                   text-amber-900">
+                            class="mt-4 text-xl font-semibold text-amber-900">
                             QR Already Scanned
                         </h3>
 
-                        <p class="mt-1
-                                   font-mono
-                                   text-lg
-                                   font-semibold
-                                   text-amber-800"
+                        <p class="mt-1 font-mono text-lg font-semibold text-amber-800"
                             x-text="
                                 result.guest_code
                             ">
                         </p>
 
                         <div
-                            class="mt-4
-                                   text-sm
-                                   text-amber-700">
+                            class="mt-4 text-sm text-amber-700">
 
                             <p>
                                 Previous Check-in:
                             </p>
 
-                            <p class="mt-1
-                                       font-medium"
+                            <p class="mt-1 font-medium"
                                 x-text="
                                     result.checked_in_at
                                 ">
@@ -170,33 +132,19 @@
                         === 'invalid'
                     ">
                     <div
-                        class="rounded-2xl
-                               border border-red-200
-                               bg-red-50
-                               p-6">
+                        class="p-6 border border-red-200 rounded-2xl bg-red-50">
 
                         <div
-                            class="flex size-12
-                                   items-center
-                                   justify-center
-                                   rounded-full
-                                   bg-red-100
-                                   text-2xl
-                                   text-red-700">
+                            class="flex items-center justify-center text-2xl text-red-700 bg-red-100 rounded-full size-12">
                             ×
                         </div>
 
                         <h3
-                            class="mt-4
-                                   text-xl
-                                   font-semibold
-                                   text-red-900">
+                            class="mt-4 text-xl font-semibold text-red-900">
                             Invalid QR
                         </h3>
 
-                        <p class="mt-2
-                                   text-sm
-                                   text-red-700"
+                        <p class="mt-2 text-sm text-red-700"
                             x-text="
                                 result.message
                             "></p>
@@ -225,54 +173,35 @@
             </button>
 
             {{-- Scanner --}}
-            <div class="overflow-hidden
-                       rounded-2xl bg-white
-                       shadow-sm">
+            <div class="overflow-hidden bg-white shadow-sm rounded-2xl">
 
                 <div class="p-4">
 
-                    <div id="qr-reader" class="overflow-hidden
-                               rounded-xl"></div>
+                    <div id="qr-reader" class="overflow-hidden rounded-xl"></div>
 
                 </div>
 
 
-                <div class="border-t
-                           border-gray-100
-                           px-5 py-4">
+                <div class="px-5 py-4 border-t border-gray-100">
 
-                    <div class="flex items-center
-                               justify-between">
+                    <div class="flex items-center justify-between">
 
                         <div>
                             <p
-                                class="text-sm
-                                       font-medium
-                                       text-gray-900">
+                                class="text-sm font-medium text-gray-900">
                                 Scanner
                             </p>
 
-                            <p class="mt-1
-                                       text-xs
-                                       text-gray-500"
+                            <p class="mt-1 text-xs text-gray-500"
                                 x-text="scannerMessage"></p>
                             <button x-show="!scannerReady" x-cloak type="button" @click="retryCamera()"
-                                class="mt-3
-           rounded-lg
-           border border-gray-300
-           bg-white
-           px-3 py-2
-           text-xs font-medium
-           text-gray-700
-           transition
-           hover:bg-gray-50">
+                                class="px-3 py-2 mt-3 text-xs font-medium text-gray-700 transition bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
                                 Try Again
                             </button>
                         </div>
 
 
-                        <div class="size-3
-                                   rounded-full"
+                        <div class="rounded-full size-3"
                             :class="scannerReady
                                 ?
                                 'bg-green-500' :
@@ -286,18 +215,12 @@
             </div>
 
             {{-- Manual input fallback --}}
-            <div class="mt-6
-           rounded-2xl
-           bg-white p-5
-           shadow-sm">
+            <div class="p-5 mt-6 bg-white shadow-sm rounded-2xl">
 
                 <details>
 
                     <summary
-                        class="cursor-pointer
-                   text-sm
-                   font-medium
-                   text-gray-700">
+                        class="text-sm font-medium text-gray-700 cursor-pointer">
                         Manual Guest Code
                     </summary>
 
@@ -305,16 +228,11 @@
                         Enter the guest code printed below the QR.
                     </p>
 
-                    <form class="mt-4 flex gap-2" @submit.prevent="manualCheckIn()">
+                    <form class="flex gap-2 mt-4" @submit.prevent="manualCheckIn()">
 
                         <input type="text" x-model="manualValue" placeholder="guest00001" autocomplete="off"
                             autocapitalize="none" spellcheck="false"
-                            class="min-w-0
-                       flex-1
-                       rounded-lg
-                       border-gray-300
-                       font-mono
-                       text-sm">
+                            class="flex-1 min-w-0 font-mono text-sm border-gray-300 rounded-lg">
 
                         <button type="submit" :disabled="processing"
                             class="rounded-lg

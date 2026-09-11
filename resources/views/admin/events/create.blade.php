@@ -19,9 +19,9 @@
 
 
     <div class="py-12">
-        <div class="mx-auto max-w-3xl px-4 sm:px-6 lg:px-8">
+        <div class="max-w-3xl px-4 mx-auto sm:px-6 lg:px-8">
 
-            <div class="rounded-xl bg-white p-6 shadow-sm sm:p-8">
+            <div class="p-6 bg-white shadow-sm rounded-xl sm:p-8">
 
                 <form
                     method="POST"
@@ -32,13 +32,11 @@
 
                     @include('admin.events.partials.form')
 
-                    <div class="mt-8 flex justify-end gap-3">
+                    <div class="flex justify-end gap-3 mt-8">
 
                         <a
                             href="{{ route('admin.events.index') }}"
-                            class="rounded-lg border border-gray-300 px-5 py-3
-                                   text-sm font-medium text-gray-700
-                                   hover:bg-gray-50"
+                            class="px-5 py-3 text-sm font-medium text-gray-700 border border-gray-300 rounded-lg hover:bg-gray-50"
                         >
                             Cancel
                         </a>

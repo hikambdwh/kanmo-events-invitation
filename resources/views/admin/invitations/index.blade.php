@@ -3,23 +3,17 @@
     <x-slot name="header">
 
         <div
-            class="flex flex-col gap-4
-                   sm:flex-row
-                   sm:items-center
-                   sm:justify-between">
+            class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 
             <div>
 
                 <a href="{{ route('admin.events.show', $event) }}"
-                    class="text-sm text-gray-500
-                           hover:text-gray-900">
+                    class="text-sm text-gray-500 hover:text-gray-900">
                     ← {{ $event->name }}
                 </a>
 
                 <h2
-                    class="mt-1 text-xl
-                           font-semibold
-                           text-gray-900">
+                    class="mt-1 text-xl font-semibold text-gray-900">
                     Invitations
                 </h2>
 
@@ -33,11 +27,7 @@
                     @csrf
 
                     <input type="number" name="quantity" min="1" max="1000" value="10"
-                        class="w-24 rounded-lg
-                   border-gray-300
-                   text-sm
-                   focus:border-gray-900
-                   focus:ring-gray-900"
+                        class="w-24 text-sm border-gray-300 rounded-lg focus:border-gray-900 focus:ring-gray-900"
                         required>
 
                     <button type="submit"
@@ -63,18 +53,13 @@
 
     <div class="py-12">
 
-        <div class="mx-auto max-w-7xl
-                   px-4 sm:px-6 lg:px-8">
+        <div class="px-4 mx-auto max-w-7xl sm:px-6 lg:px-8">
 
             {{-- Notification --}}
 
             @if (session('success'))
                 <div
-                    class="mb-6 rounded-lg
-                           border border-green-200
-                           bg-green-50
-                           px-4 py-3
-                           text-sm text-green-700">
+                    class="px-4 py-3 mb-6 text-sm text-green-700 border border-green-200 rounded-lg bg-green-50">
                     {{ session('success') }}
                 </div>
             @endif
@@ -83,14 +68,9 @@
             @if ($errors->any())
 
                 <div
-                    class="mb-6 rounded-lg
-                           border border-red-200
-                           bg-red-50
-                           px-4 py-3
-                           text-sm text-red-700">
+                    class="px-4 py-3 mb-6 text-sm text-red-700 border border-red-200 rounded-lg bg-red-50">
 
-                    <ul class="list-disc
-                               space-y-1 pl-5">
+                    <ul class="pl-5 space-y-1 list-disc">
 
                         @foreach ($errors->all() as $error)
                             <li>
@@ -107,57 +87,44 @@
 
             {{-- Statistics --}}
 
-            <div class="grid gap-4
-                       sm:grid-cols-3">
+            <div class="grid gap-4 sm:grid-cols-3">
 
-                <div class="rounded-xl bg-white
-                           p-5 shadow-sm">
+                <div class="p-5 bg-white shadow-sm rounded-xl">
 
-                    <p class="text-sm
-                               text-gray-500">
+                    <p class="text-sm text-gray-500">
                         Total Invitations
                     </p>
 
                     <p
-                        class="mt-2 text-2xl
-                               font-semibold
-                               text-gray-900">
+                        class="mt-2 text-2xl font-semibold text-gray-900">
                         {{ number_format($statistics['total']) }}
                     </p>
 
                 </div>
 
 
-                <div class="rounded-xl bg-white
-                           p-5 shadow-sm">
+                <div class="p-5 bg-white shadow-sm rounded-xl">
 
-                    <p class="text-sm
-                               text-gray-500">
+                    <p class="text-sm text-gray-500">
                         Available
                     </p>
 
                     <p
-                        class="mt-2 text-2xl
-                               font-semibold
-                               text-gray-900">
+                        class="mt-2 text-2xl font-semibold text-gray-900">
                         {{ number_format($statistics['available']) }}
                     </p>
 
                 </div>
 
 
-                <div class="rounded-xl bg-white
-                           p-5 shadow-sm">
+                <div class="p-5 bg-white shadow-sm rounded-xl">
 
-                    <p class="text-sm
-                               text-gray-500">
+                    <p class="text-sm text-gray-500">
                         Checked In
                     </p>
 
                     <p
-                        class="mt-2 text-2xl
-                               font-semibold
-                               text-gray-900">
+                        class="mt-2 text-2xl font-semibold text-gray-900">
                         {{ number_format($statistics['checked_in']) }}
                     </p>
 
@@ -168,9 +135,7 @@
 
             {{-- Filter --}}
 
-            <div class="mt-6 rounded-xl
-                       bg-white p-5
-                       shadow-sm">
+            <div class="p-5 mt-6 bg-white shadow-sm rounded-xl">
 
                 <div x-data="invitationFilter({
                     url: '{{ route('admin.events.invitations.index', $event) }}',
@@ -180,11 +145,9 @@
                 })" class="mt-6">
 
                     {{-- Search & Filter --}}
-                    <div class="rounded-xl bg-white
-               p-5 shadow-sm">
+                    <div class="p-5 bg-white shadow-sm rounded-xl">
 
-                        <div class="flex flex-col gap-3
-                   sm:flex-row">
+                        <div class="flex flex-col gap-3 sm:flex-row">
 
                             {{-- Search --}}
                             <div class="relative flex-1">
@@ -204,13 +167,9 @@
 
                                 {{-- Loading spinner --}}
                                 <div x-show="loading" x-cloak
-                                    class="absolute
-                           right-3 top-1/2
-                           -translate-y-1/2">
+                                    class="absolute -translate-y-1/2 right-3 top-1/2">
 
-                                    <svg class="size-4
-                               animate-spin
-                               text-gray-400"
+                                    <svg class="text-gray-400 size-4 animate-spin"
                                         viewBox="0 0 24 24" fill="none">
                                         <circle class="opacity-25" cx="12" cy="12" r="10"
                                             stroke="currentColor" stroke-width="4" />
@@ -293,14 +252,7 @@
                    backdrop-blur-[1px]">
 
                             <div
-                                class="flex items-center
-                       gap-2
-                       rounded-lg
-                       bg-white
-                       px-4 py-3
-                       text-sm
-                       text-gray-600
-                       shadow">
+                                class="flex items-center gap-2 px-4 py-3 text-sm text-gray-600 bg-white rounded-lg shadow">
 
                                 <svg class="size-4 animate-spin" viewBox="0 0 24 24" fill="none">
                                     <circle class="opacity-25" cx="12" cy="12" r="10"
@@ -339,44 +291,31 @@
             csrf: '{{ csrf_token() }}'
         })" @open-download-modal.window="downloadModal = true" x-show="downloadModal"
             x-cloak @keydown.escape.window="downloadModal = false"
-            class="fixed inset-0 z-50
-           flex items-center justify-center
-           p-4">
+            class="fixed inset-0 z-50 flex items-center justify-center p-4">
             {{-- Overlay --}}
             <div x-show="downloadModal" x-transition.opacity @click="downloadModal = false"
-                class="absolute inset-0
-               bg-black/50"></div>
+                class="absolute inset-0 bg-black/50"></div>
 
 
             {{-- Modal --}}
             <div x-show="downloadModal" x-transition @keydown.escape.window="downloadModal = false"
-                class="relative z-10
-               w-full max-w-lg
-               rounded-2xl
-               bg-white
-               p-6
-               shadow-xl">
+                class="relative z-10 w-full max-w-lg p-6 bg-white shadow-xl rounded-2xl">
 
                 <div class="flex items-start justify-between gap-4">
 
                     <div>
-                        <h3 class="text-lg font-semibold
-                           text-gray-900">
+                        <h3 class="text-lg font-semibold text-gray-900">
                             Download Invitations
                         </h3>
 
-                        <p class="mt-1 text-sm
-                           text-gray-500">
+                        <p class="mt-1 text-sm text-gray-500">
                             Pilih format export invitation.
                         </p>
                     </div>
 
 
                     <button type="button" @click="downloadModal = false"
-                        class="rounded-lg p-2
-                       text-gray-400
-                       hover:bg-gray-100
-                       hover:text-gray-700">
+                        class="p-2 text-gray-400 rounded-lg hover:bg-gray-100 hover:text-gray-700">
                         ✕
                     </button>
 
@@ -402,8 +341,7 @@
 
                             </p>
 
-                            <p class="mt-1 text-sm
-                   text-gray-500">
+                            <p class="mt-1 text-sm text-gray-500">
                                 Download all QR codes in a single ZIP file.
                             </p>
 
@@ -413,8 +351,7 @@
                             →
                         </span>
 
-                        <svg x-show="processing" x-cloak class="size-5 animate-spin
-               text-gray-500"
+                        <svg x-show="processing" x-cloak class="text-gray-500 size-5 animate-spin"
                             viewBox="0 0 24 24" fill="none">
                             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
                                 stroke-width="4" />
@@ -430,24 +367,18 @@
         || status === 'completed'
         || error
     " x-cloak
-                        class="rounded-xl
-           border border-gray-200
-           p-5">
+                        class="p-5 border border-gray-200 rounded-xl">
 
                         <template x-if="processing">
                             <div>
 
-                                <div class="flex items-center
-                       justify-between">
+                                <div class="flex items-center justify-between">
                                     <p
-                                        class="text-sm
-                           font-medium
-                           text-gray-700">
+                                        class="text-sm font-medium text-gray-700">
                                         Generating QR
                                     </p>
 
-                                    <p class="text-sm
-                           text-black"
+                                    <p class="text-sm text-black"
                                         x-text="
                         processed
                         + ' / '
@@ -458,10 +389,7 @@
 
 
                                 <div
-                                    class="mt-3 h-2
-                       overflow-hidden
-                       rounded-full
-                       bg-gray-100">
+                                    class="h-2 mt-3 overflow-hidden bg-gray-100 rounded-full">
 
                                     <div class="h-full
                            bg-[#f94242]
@@ -473,10 +401,7 @@
                                 </div>
 
 
-                                <p class="mt-2
-                       text-right
-                       text-xs
-                       text-gray-500"
+                                <p class="mt-2 text-xs text-right text-gray-500"
                                     x-text="progress + '%'"></p>
 
                             </div>
@@ -486,18 +411,14 @@
                         <template x-if="
             status === 'completed'
         ">
-                            <div class="flex items-center
-                   justify-between gap-4">
+                            <div class="flex items-center justify-between gap-4">
 
                                 <div>
-                                    <p class="font-medium
-                           text-gray-900">
+                                    <p class="font-medium text-gray-900">
                                         ZIP Ready
                                     </p>
 
-                                    <p class="mt-1
-                           text-sm
-                           text-gray-500"
+                                    <p class="mt-1 text-sm text-gray-500"
                                         x-text="
                         total
                         + ' QR generated'
@@ -519,18 +440,10 @@
 
                             <div>
 
-                                <p class="text-sm
-                       text-red-600" x-text="error"></p>
+                                <p class="text-sm text-red-600" x-text="error"></p>
 
                                 <button type="button" @click="continueExport()"
-                                    class="mt-3
-                       rounded-lg
-                       border
-                       border-gray-300
-                       px-4 py-2
-                       text-sm
-                       font-medium
-                       text-gray-700">
+                                    class="px-4 py-2 mt-3 text-sm font-medium text-gray-700 border border-gray-300 rounded-lg">
                                     Try Again
                                 </button>
 
@@ -556,8 +469,7 @@
 
                         </div>
 
-                        <span class="text-xl
-               text-gray-400">
+                        <span class="text-xl text-gray-400">
                             →
                         </span>
 
@@ -566,8 +478,7 @@
                 </div>
 
 
-                <div class="mt-6 flex
-                   justify-end">
+                <div class="flex justify-end mt-6">
                     <button type="button" @click="downloadModal = false"
                         class="rounded-lg
                        border
