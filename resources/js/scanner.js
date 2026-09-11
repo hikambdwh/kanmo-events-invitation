@@ -20,6 +20,8 @@ window.scannerApp = function(config) {
 
         lastScannedValue: null,
 
+        audioContext: null,
+
 
         /*
          * ==========================================================
@@ -28,14 +30,17 @@ window.scannerApp = function(config) {
          */
 
         async init() {
+
             await this.$nextTick();
 
-            /*
-             * Kamera browser membutuhkan HTTPS
-             * kecuali localhost.
-             */
+
+            this.setupAudioUnlock();
+
+
             if (!window.isSecureContext) {
-                this.scannerReady = false;
+
+                this.scannerReady =
+                    false;
 
                 this.scannerMessage =
                     'Scanner membutuhkan koneksi HTTPS.';
@@ -576,108 +581,178 @@ window.scannerApp = function(config) {
          */
 
         async checkIn(value) {
-            try {
-                const response =
-                    await fetch(
-                        config.checkInUrl, {
-                            method: 'POST',
 
-                            headers: {
-                                'Accept': 'application/json',
+        let soundPlayed = false;
 
-                                'Content-Type': 'application/json',
 
-                                'X-CSRF-TOKEN': config.csrf,
-                            },
+        try {
 
-                            body: JSON.stringify({
-                                qr_value: value,
+            const response =
+                await fetch(
+                    config.checkInUrl,
+                    {
+                        method: 'POST',
+
+                        headers: {
+                            'Accept':
+                                'application/json',
+
+                            'Content-Type':
+                                'application/json',
+
+                            'X-CSRF-TOKEN':
+                                config.csrf,
+                        },
+
+                        body:
+                            JSON.stringify({
+                                qr_value:
+                                    value,
                             }),
-                        }
-                    );
-
-
-                /*
-                 * Response Laravel biasanya JSON.
-                 */
-                let data;
-
-                try {
-                    data =
-                        await response.json();
-                } catch (_) {
-                    throw new Error(
-                        'Server memberikan response yang tidak valid.'
-                    );
-                }
-
-
-                console.log(
-                    'Check-in response:',
-                    response.status,
-                    data
+                    }
                 );
 
 
-                /*
-                 * Tetap tampilkan hasil:
-                 *
-                 * success
-                 * already_checked_in
-                 * invalid
-                 */
-                this.result =
-                    data;
+            /*
+            * Response Laravel
+            * seharusnya JSON.
+            */
+            let data;
 
 
-                /*
-                 * 404, 409 dan 422 adalah
-                 * response bisnis yang valid.
-                 *
-                 * 409:
-                 * QR sudah digunakan.
-                 *
-                 * 404:
-                 * QR/event tidak ditemukan.
-                 *
-                 * 422:
-                 * format invalid.
-                 */
-                if (
-                    !response.ok &&
-                    ![
-                        404,
-                        409,
-                        422,
-                    ].includes(
-                        response.status
-                    )
-                ) {
-                    throw new Error(
-                        data.message ??
-                        'Check-in gagal.'
-                    );
-                }
+            try {
 
-            } catch (error) {
-                console.error(
-                    'CHECK-IN ERROR:',
-                    error
+                data =
+                    await response.json();
+
+            } catch (_) {
+
+                throw new Error(
+                    'Server memberikan response yang tidak valid.'
                 );
-
-
-                this.result = {
-                    status: 'invalid',
-
-                    message: error?.message ??
-                        'Terjadi kesalahan saat check-in.',
-                };
-
-            } finally {
-                this.processing =
-                    false;
             }
-        },
+
+
+            console.log(
+                'Check-in response:',
+                response.status,
+                data
+            );
+
+
+            /*
+            * Response bisnis yang kita kenal.
+            */
+            const businessStatuses = [
+                'success',
+                'already_checked_in',
+                'invalid',
+            ];
+
+
+            /*
+            * Response HTTP yang memang
+            * digunakan oleh proses check-in.
+            */
+            const allowedHttpErrors = [
+                404,
+                409,
+                422,
+            ];
+
+
+            /*
+            * Kalau server memberikan error
+            * selain response bisnis normal,
+            * lempar sebagai system error.
+            */
+            if (
+                !response.ok &&
+                !allowedHttpErrors.includes(
+                    response.status
+                )
+            ) {
+
+                throw new Error(
+                    data.message ??
+                    'Check-in gagal.'
+                );
+            }
+
+
+            /*
+            * Pastikan status yang diberikan
+            * backend dikenali frontend.
+            */
+            if (
+                !businessStatuses.includes(
+                    data.status
+                )
+            ) {
+
+                throw new Error(
+                    data.message ??
+                    'Status check-in tidak dikenal.'
+                );
+            }
+
+
+            /*
+            * Tampilkan hasil.
+            */
+            this.result =
+                data;
+
+
+            /*
+            * Bunyi sesuai hasil.
+            */
+            await this.playStatusSound(
+                data.status
+            );
+
+
+            soundPlayed =
+                true;
+
+
+        } catch (error) {
+
+            console.error(
+                'CHECK-IN ERROR:',
+                error
+            );
+
+
+            this.result = {
+
+                status:
+                    'invalid',
+
+                message:
+                    error?.message ??
+                    'Terjadi kesalahan saat check-in.',
+            };
+
+
+            /*
+            * Jangan sampai sound
+            * dimainkan dua kali.
+            */
+            if (!soundPlayed) {
+
+                await this.playStatusSound(
+                    'invalid'
+                );
+            }
+
+
+        } finally {
+
+            this.processing =
+                false;
+        }
+    },
 
 
         /*
@@ -738,6 +813,270 @@ window.scannerApp = function(config) {
          * ==========================================================
          */
 
+        async prepareAudio() {
+
+        if (!this.audioContext) {
+
+            const AudioContext =
+                window.AudioContext
+                || window.webkitAudioContext;
+
+            if (!AudioContext) {
+                return null;
+            }
+
+            this.audioContext =
+                new AudioContext();
+        }
+
+
+        if (
+            this.audioContext.state
+            === 'suspended'
+        ) {
+
+            try {
+
+                await this.audioContext.resume();
+
+            } catch (_) {}
+
+        }
+
+
+        return this.audioContext;
+    },
+
+
+    playTone(
+        frequency,
+        duration = 0.15,
+        delay = 0,
+        volume = 0.12,
+        type = 'sine'
+    ) {
+
+        const context =
+            this.audioContext;
+
+
+        if (
+            !context
+            || context.state !== 'running'
+        ) {
+            return;
+        }
+
+
+        const oscillator =
+            context.createOscillator();
+
+        const gain =
+            context.createGain();
+
+
+        const startTime =
+            context.currentTime
+            + delay;
+
+
+        oscillator.type =
+            type;
+
+        oscillator.frequency
+            .setValueAtTime(
+                frequency,
+                startTime
+            );
+
+
+        /*
+        * Fade in/out supaya suara
+        * tidak "klik".
+        */
+        gain.gain
+            .setValueAtTime(
+                0.001,
+                startTime
+            );
+
+        gain.gain
+            .exponentialRampToValueAtTime(
+                volume,
+                startTime + 0.01
+            );
+
+        gain.gain
+            .exponentialRampToValueAtTime(
+                0.001,
+                startTime + duration
+            );
+
+
+        oscillator.connect(
+            gain
+        );
+
+        gain.connect(
+            context.destination
+        );
+
+
+        oscillator.start(
+            startTime
+        );
+
+        oscillator.stop(
+            startTime
+            + duration
+            + 0.02
+        );
+    },
+
+    setupAudioUnlock() {
+
+        const unlock =
+            async () => {
+
+                await this.prepareAudio();
+
+
+                document.removeEventListener(
+                    'pointerdown',
+                    unlock
+                );
+
+                document.removeEventListener(
+                    'keydown',
+                    unlock
+                );
+            };
+
+
+        document.addEventListener(
+            'pointerdown',
+            unlock
+        );
+
+
+        document.addEventListener(
+            'keydown',
+            unlock
+        );
+    },
+
+
+    async playStatusSound(status) {
+
+        await this.prepareAudio();
+
+
+        if (
+            !this.audioContext
+            || this.audioContext.state
+                !== 'running'
+        ) {
+            return;
+        }
+
+
+        /*
+        * =====================================
+        * SUCCESS
+        *
+        * Tiga nada naik:
+        * "ding ding ding"
+        * =====================================
+        */
+        if (status === 'success') {
+
+            this.playTone(
+                523.25,
+                0.12,
+                0,
+                0.10,
+                'sine'
+            );
+
+            this.playTone(
+                659.25,
+                0.12,
+                0.10,
+                0.11,
+                'sine'
+            );
+
+            this.playTone(
+                783.99,
+                0.22,
+                0.20,
+                0.12,
+                'sine'
+            );
+
+            return;
+        }
+
+
+        /*
+        * =====================================
+        * ALREADY CHECKED IN
+        *
+        * Dua beep medium.
+        * =====================================
+        */
+        if (
+            status ===
+            'already_checked_in'
+        ) {
+
+            this.playTone(
+                440,
+                0.18,
+                0,
+                0.11,
+                'triangle'
+            );
+
+            this.playTone(
+                440,
+                0.18,
+                0.24,
+                0.11,
+                'triangle'
+            );
+
+            return;
+        }
+
+
+        /*
+        * =====================================
+        * INVALID
+        *
+        * Nada turun seperti error.
+        * =====================================
+        */
+        if (status === 'invalid') {
+
+            this.playTone(
+                330,
+                0.18,
+                0,
+                0.10,
+                'square'
+            );
+
+            this.playTone(
+                220,
+                0.28,
+                0.16,
+                0.10,
+                'square'
+            );
+        }
+    },
+
         async manualCheckIn() {
             const value =
                 this.manualValue
@@ -757,6 +1096,14 @@ window.scannerApp = function(config) {
 
             this.processing =
                 true;
+            
+            try {
+
+                this.scanner?.pause(
+                    true
+                );
+
+            } catch (_) {}
 
 
             /*
