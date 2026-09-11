@@ -22,7 +22,7 @@
             <x-input-error :messages="$errors->get('password')" class="mt-2" />
         </div>
         @if ($errors->any())
-            <div class="text-xs text-red-500 alert alert-danger">
+            <div class="mt-1 text-xs text-red-500 alert alert-danger">
                 <ul>
                     @foreach ($errors->all() as $error)
                         <li>{{ $error }}</li>
