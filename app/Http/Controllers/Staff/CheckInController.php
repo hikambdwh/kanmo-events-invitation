@@ -23,9 +23,11 @@ class CheckInController extends Controller
             ],
         ]);
 
+
         $input = trim(
             $validated['qr_value']
         );
+
 
         return DB::transaction(
             function () use (
@@ -34,7 +36,9 @@ class CheckInController extends Controller
             ) {
 
                 $event = null;
+
                 $invitation = null;
+
 
                 /*
                  * =========================================
@@ -56,18 +60,22 @@ class CheckInController extends Controller
                         2
                     );
 
+
                     $eventPrefix =
                         trim($eventPrefix);
 
                     $token =
                         trim($token);
 
+
                     if (
                         $eventPrefix === ''
                         || $token === ''
                     ) {
+
                         return response()->json([
                             'status' => 'invalid',
+
                             'message' =>
                             'Format QR tidak valid.',
                         ], 422);
@@ -83,14 +91,21 @@ class CheckInController extends Controller
 
 
                     if (!$event) {
+
                         return response()->json([
                             'status' => 'invalid',
+
                             'message' =>
                             'Event QR tidak ditemukan.',
                         ], 404);
                     }
 
 
+                    /*
+                     * Lock row supaya dua HP staff
+                     * yang scan bersamaan tidak dapat
+                     * melewati scan limit.
+                     */
                     $invitation =
                         Invitation::query()
                         ->where(
@@ -106,13 +121,16 @@ class CheckInController extends Controller
 
 
                     if (!$invitation) {
+
                         return response()->json([
                             'status' => 'invalid',
+
                             'message' =>
                             'QR tidak terdaftar.',
                         ], 404);
                     }
                 }
+
 
                 /*
                  * =========================================
@@ -127,10 +145,6 @@ class CheckInController extends Controller
                     $guestCode = $input;
 
 
-                    /*
-                     * Ambil maksimal 2 untuk memastikan
-                     * guest_code tidak duplicate.
-                     */
                     $invitations =
                         Invitation::query()
                         ->where(
@@ -154,11 +168,9 @@ class CheckInController extends Controller
 
 
                     /*
-                     * Guest code sebaiknya unique.
-                     *
-                     * Kalau ternyata terdapat kode yang
-                     * sama pada lebih dari satu invitation,
-                     * jangan melakukan check-in otomatis.
+                     * Kalau guest code ditemukan
+                     * di lebih dari satu event,
+                     * jangan check-in otomatis.
                      */
                     if ($invitations->count() > 1) {
 
@@ -195,17 +207,50 @@ class CheckInController extends Controller
 
                 /*
                  * =========================================
-                 * CHECK ALREADY CHECKED IN
+                 * VALIDATE SCAN LIMIT
                  * =========================================
                  */
-                if ($invitation->checked_in_at) {
+
+                $scanLimit =
+                    (int) $invitation->scan_limit;
+
+                $scanCount =
+                    (int) $invitation->scan_count;
+
+
+                /*
+                 * Safety kalau data lama / invalid
+                 * memiliki limit 0.
+                 */
+                if ($scanLimit < 1) {
 
                     return response()->json([
-                        'status' =>
-                        'already_checked_in',
+                        'status' => 'invalid',
 
                         'message' =>
-                        'Guest sudah check-in.',
+                        'Scan limit invitation tidak valid.',
+                    ], 422);
+                }
+
+
+                /*
+                 * =========================================
+                 * LIMIT SUDAH HABIS
+                 * =========================================
+                 */
+
+                if (
+                    $scanCount >=
+                    $scanLimit
+                ) {
+
+                    return response()->json([
+
+                        'status' =>
+                        'limit_reached',
+
+                        'message' =>
+                        'QR sudah mencapai batas maksimal scan.',
 
                         'guest_code' =>
                         $invitation->guest_code,
@@ -213,10 +258,19 @@ class CheckInController extends Controller
                         'event' =>
                         $event->name,
 
+                        'scan_count' =>
+                        $scanCount,
+
+                        'scan_limit' =>
+                        $scanLimit,
+
+                        'remaining_scans' =>
+                        0,
+
                         'checked_in_at' =>
                         $invitation
                             ->checked_in_at
-                            ->format(
+                            ?->format(
                                 'd M Y H:i:s'
                             ),
 
@@ -234,11 +288,37 @@ class CheckInController extends Controller
                  * CHECK-IN
                  * =========================================
                  */
+
+                $newScanCount =
+                    $scanCount + 1;
+
+
+                $remainingScans =
+                    max(
+                        $scanLimit
+                            - $newScanCount,
+                        0
+                    );
+
+
                 $invitation->update([
 
+                    'scan_count' =>
+                    $newScanCount,
+
+                    /*
+                     * Sekarang checked_in_at berarti:
+                     *
+                     * waktu scan terakhir.
+                     */
                     'checked_in_at' =>
                     now(),
 
+                    /*
+                     * checked_in_by berarti:
+                     *
+                     * staff/admin terakhir yang scan.
+                     */
                     'checked_in_by' =>
                     $request->user()->id,
 
@@ -258,6 +338,15 @@ class CheckInController extends Controller
 
                     'event' =>
                     $event->name,
+
+                    'scan_count' =>
+                    $newScanCount,
+
+                    'scan_limit' =>
+                    $scanLimit,
+
+                    'remaining_scans' =>
+                    $remainingScans,
 
                     'checked_in_at' =>
                     $invitation

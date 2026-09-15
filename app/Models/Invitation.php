@@ -14,6 +14,8 @@ class Invitation extends Model
         'guest_number',
         'guest_code',
         'qr_token',
+        'scan_limit',
+        'scan_count',
         'checked_in_at',
         'checked_in_by',
     ];
@@ -44,7 +46,7 @@ class Invitation extends Model
 
     public function getIsCheckedInAttribute(): bool
     {
-        return $this->checked_in_at !== null;
+        return $this->scan_count >= $this->scan_limit;
     }
 
     public function getQrValueAttribute(): string
@@ -52,6 +54,15 @@ class Invitation extends Model
         return $this->event->qr_prefix
             . ':'
             . $this->qr_token;
+    }
+
+    public function getRemainingScansAttribute(): int
+    {
+        return max(
+            $this->scan_limit
+                - $this->scan_count,
+            0
+        );
     }
 
     public function getQrImageUrl(

@@ -47,16 +47,20 @@ class InvitationController extends Controller
             ->when(
                 $status === 'available',
                 fn($query) =>
-                $query->whereNull(
-                    'checked_in_at'
+                $query->whereColumn(
+                    'scan_count',
+                    '<',
+                    'scan_limit'
                 )
             )
 
             ->when(
                 $status === 'checked_in',
                 fn($query) =>
-                $query->whereNotNull(
-                    'checked_in_at'
+                $query->whereColumn(
+                    'scan_count',
+                    '>=',
+                    'scan_limit'
                 )
             )
 
@@ -100,15 +104,19 @@ class InvitationController extends Controller
 
             'available' => $event
                 ->invitations()
-                ->whereNull(
-                    'checked_in_at'
+                ->whereColumn(
+                    'scan_count',
+                    '<',
+                    'scan_limit'
                 )
                 ->count(),
 
             'checked_in' => $event
                 ->invitations()
-                ->whereNotNull(
-                    'checked_in_at'
+                ->whereColumn(
+                    'scan_count',
+                    '>=',
+                    'scan_limit'
                 )
                 ->count(),
         ];
@@ -184,6 +192,9 @@ class InvitationController extends Controller
                     'qr_token' =>
                     (string) Str::ulid(),
 
+                    'scan_limit' => 1,
+                    'scan_count' => 0,
+
                     'checked_in_at' =>
                     null,
 
@@ -217,28 +228,81 @@ class InvitationController extends Controller
         Event $event,
         Invitation $invitation
     ): RedirectResponse {
+
         abort_unless(
             $invitation->event_id === $event->id,
             404
         );
 
-        if ($invitation->checked_in_at) {
+
+        $wasScanned = DB::transaction(
+            function () use (
+                $invitation
+            ) {
+
+                $lockedInvitation =
+                    Invitation::query()
+                    ->whereKey(
+                        $invitation->id
+                    )
+                    ->lockForUpdate()
+                    ->firstOrFail();
+
+
+                /*
+             * Sudah tidak punya jatah scan.
+             */
+                if (
+                    $lockedInvitation->scan_count
+                    >=
+                    $lockedInvitation->scan_limit
+                ) {
+                    return false;
+                }
+
+
+                /*
+             * Consume 1 scan.
+             */
+                $lockedInvitation->update([
+
+                    'scan_count' =>
+                    $lockedInvitation
+                        ->scan_count + 1,
+
+                    'checked_in_at' =>
+                    now(),
+
+                    'checked_in_by' =>
+                    auth()->id(),
+
+                ]);
+
+
+                return true;
+            }
+        );
+
+
+        if (!$wasScanned) {
+
             return back()->with(
                 'info',
                 $invitation->guest_code
-                    . ' sudah berstatus scanned.'
+                    . ' sudah mencapai scan limit.'
             );
         }
 
-        $invitation->update([
-            'checked_in_at' => now(),
-            'checked_in_by' => auth()->id(),
-        ]);
+
+        $invitation->refresh();
+
 
         return back()->with(
             'success',
             $invitation->guest_code
-                . ' has been marked as scanned.'
+                . ' has been manually scanned once. '
+                . $invitation->remaining_scans
+                . ' scan(s) remaining.'
         );
     }
 
@@ -247,28 +311,96 @@ class InvitationController extends Controller
         Event $event,
         Invitation $invitation
     ): RedirectResponse {
+
         abort_unless(
             $invitation->event_id === $event->id,
             404
         );
 
-        if (!$invitation->checked_in_at) {
+
+        if ($invitation->scan_count === 0) {
             return back()->with(
                 'info',
                 $invitation->guest_code
-                    . ' masih berstatus available.'
+                    . ' belum pernah digunakan.'
             );
         }
 
+
         $invitation->update([
+            'scan_count' => 0,
+
             'checked_in_at' => null,
+
             'checked_in_by' => null,
         ]);
+
 
         return back()->with(
             'success',
             $invitation->guest_code
                 . ' has been reset and can be used again.'
+        );
+    }
+
+    public function setLimit(
+        Request $request,
+        Event $event,
+        Invitation $invitation
+    ): RedirectResponse {
+
+        abort_unless(
+            $invitation->event_id === $event->id,
+            404
+        );
+
+
+        $validated = $request->validate([
+            'scan_limit' => [
+                'required',
+                'integer',
+                'min:1',
+                'max:1000',
+            ],
+        ]);
+
+
+        $newLimit =
+            (int) $validated['scan_limit'];
+
+
+        /*
+     * Jangan izinkan limit lebih kecil
+     * daripada jumlah yang sudah digunakan.
+     *
+     * Contoh:
+     * used = 3
+     * limit baru = 2
+     *
+     * Tidak masuk akal.
+     */
+        if (
+            $newLimit <
+            $invitation->scan_count
+        ) {
+            return back()->withErrors([
+                'scan_limit' =>
+                'Limit cannot be lower than the number of scans already used.',
+            ]);
+        }
+
+
+        $invitation->update([
+            'scan_limit' => $newLimit,
+        ]);
+
+
+        return back()->with(
+            'success',
+            $invitation->guest_code
+                . ' scan limit has been updated to '
+                . $newLimit
+                . '.'
         );
     }
 }

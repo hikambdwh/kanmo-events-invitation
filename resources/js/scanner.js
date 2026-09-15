@@ -645,7 +645,7 @@ window.scannerApp = function(config) {
             */
             const businessStatuses = [
                 'success',
-                'already_checked_in',
+                'limit_reached',
                 'invalid',
             ];
 
@@ -1027,7 +1027,7 @@ window.scannerApp = function(config) {
         */
         if (
             status ===
-            'already_checked_in'
+            'limit_reached'
         ) {
 
             this.playTone(

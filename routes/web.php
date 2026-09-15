@@ -44,6 +44,8 @@ Route::middleware(['auth', 'admin',])->prefix('admin')->name('admin.')->group(fu
     Route::patch('/events/{event}/invitations/{invitation}/mark-scanned',[InvitationController::class,'markAsScanned'])->name('events.invitations.mark-scanned');
     Route::patch('/events/{event}/invitations/{invitation}/reset',[InvitationController::class,'reset'])
     ->name('events.invitations.reset');
+    Route::patch('/events/{event}/invitations/{invitation}/set-limit',[InvitationController::class,'setLimit',])
+    ->name('events.invitations.set-limit');
 });
 
 Route::middleware(['auth','scanner',])->prefix('staff')->name('staff.')->group(function () {

@@ -16,9 +16,9 @@
     <div class="py-8">
 
         <div class="max-w-lg px-4 mx-auto sm:px-6" x-data="scannerApp({
-                       checkInUrl: '{{ route('staff.check-in') }}',
-                       csrf: '{{ csrf_token() }}'
-                   })">
+            checkInUrl: '{{ route('staff.check-in') }}',
+            csrf: '{{ csrf_token() }}'
+        })">
 
             {{-- Result --}}
             <div x-show="result" x-cloak class="mt-5">
@@ -29,16 +29,14 @@
                         result?.status
                         === 'success'
                     ">
-                    <div
-                        class="p-6 border border-green-200 rounded-2xl bg-green-50">
+                    <div class="p-6 border border-green-200 rounded-2xl bg-green-50">
 
                         <div
                             class="flex items-center justify-center text-2xl text-green-700 bg-green-100 rounded-full size-12">
                             ✓
                         </div>
 
-                        <h3
-                            class="mt-4 text-xl font-semibold text-green-900">
+                        <h3 class="mt-4 text-xl font-semibold text-green-900">
                             Check-in Success
                         </h3>
 
@@ -48,8 +46,7 @@
                             ">
                         </p>
 
-                        <div
-                            class="mt-4 text-sm text-green-700">
+                        <div class="mt-4 text-sm text-green-700">
 
                             <p
                                 x-text="
@@ -63,64 +60,125 @@
                                 ">
                             </p>
 
+                            <div class="p-3 mt-4 rounded-xl bg-green-100/70">
+
+                                <div class="flex items-center justify-between">
+                                    <span>
+                                        Scan Usage
+                                    </span>
+
+                                    <span class="font-semibold"
+                                        x-text="
+                result.scan_count
+                + ' / '
+                + result.scan_limit
+            "></span>
+                                </div>
+
+
+                                <div class="flex items-center justify-between mt-1">
+                                    <span>
+                                        Remaining
+                                    </span>
+
+                                    <span class="font-semibold" x-text="result.remaining_scans"></span>
+                                </div>
+
+                            </div>
+
                         </div>
 
                     </div>
                 </template>
 
 
-                {{-- Already Checked In --}}
-                <template
-                    x-if="
-                        result?.status
-                        === 'already_checked_in'
-                    ">
-                    <div
-                        class="p-6 border rounded-2xl border-amber-200 bg-amber-50">
+                {{-- Scan Limit Reached --}}
+                <template x-if="
+        result?.status
+        === 'limit_reached'
+    ">
+
+                    <div class="p-6 border rounded-2xl border-amber-200 bg-amber-50">
 
                         <div
                             class="flex items-center justify-center text-2xl rounded-full size-12 bg-amber-100 text-amber-700">
                             !
                         </div>
 
-                        <h3
-                            class="mt-4 text-xl font-semibold text-amber-900">
-                            QR Already Scanned
+
+                        <h3 class="mt-4 text-xl font-semibold text-amber-900">
+                            Scan Limit Reached
                         </h3>
+
 
                         <p class="mt-1 font-mono text-lg font-semibold text-amber-800"
                             x-text="
-                                result.guest_code
-                            ">
+                result.guest_code
+            "></p>
+
+
+                        <p class="mt-2 text-sm text-amber-700">
+                            QR ini sudah mencapai
+                            batas maksimal penggunaan.
                         </p>
 
-                        <div
-                            class="mt-4 text-sm text-amber-700">
 
-                            <p>
-                                Previous Check-in:
-                            </p>
+                        <div class="p-3 mt-4 text-sm rounded-xl bg-amber-100/70 text-amber-800">
 
-                            <p class="mt-1 font-medium"
-                                x-text="
-                                    result.checked_in_at
-                                ">
-                            </p>
+                            <div class="flex items-center justify-between">
+                                <span>
+                                    Scan Usage
+                                </span>
 
-                            <p x-show="
-                                    result.checked_in_by
-                                "
-                                class="mt-1">
-                                By:
-                                <span
+                                <span class="font-semibold"
                                     x-text="
-                                        result
-                                            .checked_in_by
-                                    "></span>
-                            </p>
+                        result.scan_count
+                        + ' / '
+                        + result.scan_limit
+                    "></span>
+                            </div>
+                            <div class="flex items-center justify-between mt-1">
+                                <span>
+                                    Remaining
+                                </span>
+                                <span class="font-semibold">
+                                    0
+                                </span>
+                            </div>
 
                         </div>
 
+
+                        <div class="mt-4 text-sm text-amber-700">
+
+                            <template x-if="
+                    result.checked_in_at
+                ">
+                                <div>
+                                    <p>
+                                        Last Scan:
+                                    </p>
+
+                                    <p class="mt-1 font-medium"
+                                        x-text="
+                            result.checked_in_at
+                        ">
+                                    </p>
+                                </div>
+                            </template>
+
+
+                            <p x-show="
+                    result.checked_in_by
+                " class="mt-1">
+                                By:
+
+                                <span
+                                    x-text="
+                        result.checked_in_by
+                    "></span>
+                            </p>
+                        </div>
                     </div>
                 </template>
 
@@ -131,16 +189,14 @@
                         result?.status
                         === 'invalid'
                     ">
-                    <div
-                        class="p-6 border border-red-200 rounded-2xl bg-red-50">
+                    <div class="p-6 border border-red-200 rounded-2xl bg-red-50">
 
                         <div
                             class="flex items-center justify-center text-2xl text-red-700 bg-red-100 rounded-full size-12">
                             ×
                         </div>
 
-                        <h3
-                            class="mt-4 text-xl font-semibold text-red-900">
+                        <h3 class="mt-4 text-xl font-semibold text-red-900">
                             Invalid QR
                         </h3>
 
@@ -187,13 +243,11 @@
                     <div class="flex items-center justify-between">
 
                         <div>
-                            <p
-                                class="text-sm font-medium text-gray-900">
+                            <p class="text-sm font-medium text-gray-900">
                                 Scanner
                             </p>
 
-                            <p class="mt-1 text-xs text-gray-500"
-                                x-text="scannerMessage"></p>
+                            <p class="mt-1 text-xs text-gray-500" x-text="scannerMessage"></p>
                             <button x-show="!scannerReady" x-cloak type="button" @click="retryCamera()"
                                 class="px-3 py-2 mt-3 text-xs font-medium text-gray-700 transition bg-white border border-gray-300 rounded-lg hover:bg-gray-50">
                                 Try Again
@@ -219,8 +273,7 @@
 
                 <details>
 
-                    <summary
-                        class="text-sm font-medium text-gray-700 cursor-pointer">
+                    <summary class="text-sm font-medium text-gray-700 cursor-pointer">
                         Manual Guest Code
                     </summary>
 
