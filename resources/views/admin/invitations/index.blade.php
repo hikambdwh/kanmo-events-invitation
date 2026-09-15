@@ -2,18 +2,15 @@
 
     <x-slot name="header">
 
-        <div
-            class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
 
             <div>
 
-                <a href="{{ route('admin.events.show', $event) }}"
-                    class="text-sm text-gray-500 hover:text-gray-900">
+                <a href="{{ route('admin.events.show', $event) }}" class="text-sm text-gray-500 hover:text-gray-900">
                     ← {{ $event->name }}
                 </a>
 
-                <h2
-                    class="mt-1 text-xl font-semibold text-gray-900">
+                <h2 class="mt-1 text-xl font-semibold text-gray-900">
                     Invitations
                 </h2>
 
@@ -58,8 +55,7 @@
             {{-- Notification --}}
 
             @if (session('success'))
-                <div
-                    class="px-4 py-3 mb-6 text-sm text-green-700 border border-green-200 rounded-lg bg-green-50">
+                <div class="px-4 py-3 mb-6 text-sm text-green-700 border border-green-200 rounded-lg bg-green-50">
                     {{ session('success') }}
                 </div>
             @endif
@@ -67,8 +63,7 @@
 
             @if ($errors->any())
 
-                <div
-                    class="px-4 py-3 mb-6 text-sm text-red-700 border border-red-200 rounded-lg bg-red-50">
+                <div class="px-4 py-3 mb-6 text-sm text-red-700 border border-red-200 rounded-lg bg-red-50">
 
                     <ul class="pl-5 space-y-1 list-disc">
 
@@ -86,46 +81,75 @@
 
 
             {{-- Statistics --}}
+            <div class="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
 
-            <div class="grid gap-4 sm:grid-cols-3">
-
+                {{-- Total Invitations --}}
                 <div class="p-5 bg-white shadow-sm rounded-xl">
 
                     <p class="text-sm text-gray-500">
                         Total Invitations
                     </p>
 
-                    <p
-                        class="mt-2 text-2xl font-semibold text-gray-900">
-                        {{ number_format($statistics['total']) }}
+                    <p class="mt-2 text-2xl font-semibold text-gray-900">
+                        {{ number_format($statistics['total_invitations']) }}
+                    </p>
+
+                    <p class="mt-1 text-xs text-gray-400">
+                        Based on total QR limits
                     </p>
 
                 </div>
 
 
+                {{-- Total QR --}}
                 <div class="p-5 bg-white shadow-sm rounded-xl">
 
                     <p class="text-sm text-gray-500">
-                        Available
+                        Total QR
                     </p>
 
-                    <p
-                        class="mt-2 text-2xl font-semibold text-gray-900">
-                        {{ number_format($statistics['available']) }}
+                    <p class="mt-2 text-2xl font-semibold text-gray-900">
+                        {{ number_format($statistics['total_qr']) }}
+                    </p>
+
+                    <p class="mt-1 text-xs text-gray-400">
+                        Generated QR codes
                     </p>
 
                 </div>
 
 
+                {{-- Checked In --}}
                 <div class="p-5 bg-white shadow-sm rounded-xl">
 
                     <p class="text-sm text-gray-500">
                         Checked In
                     </p>
 
-                    <p
-                        class="mt-2 text-2xl font-semibold text-gray-900">
+                    <p class="mt-2 text-2xl font-semibold text-gray-900">
                         {{ number_format($statistics['checked_in']) }}
+                    </p>
+
+                    <p class="mt-1 text-xs text-gray-400">
+                        Total scans used
+                    </p>
+
+                </div>
+
+
+                {{-- Available QR --}}
+                <div class="p-5 bg-white shadow-sm rounded-xl">
+
+                    <p class="text-sm text-gray-500">
+                        Available QR
+                    </p>
+
+                    <p class="mt-2 text-2xl font-semibold text-gray-900">
+                        {{ number_format($statistics['available_qr']) }}
+                    </p>
+
+                    <p class="mt-1 text-xs text-gray-400">
+                        QR codes that can still be scanned
                     </p>
 
                 </div>
@@ -166,11 +190,9 @@
 
 
                                 {{-- Loading spinner --}}
-                                <div x-show="loading" x-cloak
-                                    class="absolute -translate-y-1/2 right-3 top-1/2">
+                                <div x-show="loading" x-cloak class="absolute -translate-y-1/2 right-3 top-1/2">
 
-                                    <svg class="text-gray-400 size-4 animate-spin"
-                                        viewBox="0 0 24 24" fill="none">
+                                    <svg class="text-gray-400 size-4 animate-spin" viewBox="0 0 24 24" fill="none">
                                         <circle class="opacity-25" cx="12" cy="12" r="10"
                                             stroke="currentColor" stroke-width="4" />
 
@@ -289,8 +311,8 @@
         <div x-data="qrExport({
             startUrl: '{{ route('admin.events.exports.qr.start', $event) }}',
             csrf: '{{ csrf_token() }}'
-        })" @open-download-modal.window="downloadModal = true" x-show="downloadModal"
-            x-cloak @keydown.escape.window="downloadModal = false"
+        })" @open-download-modal.window="downloadModal = true" x-show="downloadModal" x-cloak
+            @keydown.escape.window="downloadModal = false"
             class="fixed inset-0 z-50 flex items-center justify-center p-4">
             {{-- Overlay --}}
             <div x-show="downloadModal" x-transition.opacity @click="downloadModal = false"
@@ -373,8 +395,7 @@
                             <div>
 
                                 <div class="flex items-center justify-between">
-                                    <p
-                                        class="text-sm font-medium text-gray-700">
+                                    <p class="text-sm font-medium text-gray-700">
                                         Generating QR
                                     </p>
 
@@ -388,8 +409,7 @@
                                 </div>
 
 
-                                <div
-                                    class="h-2 mt-3 overflow-hidden bg-gray-100 rounded-full">
+                                <div class="h-2 mt-3 overflow-hidden bg-gray-100 rounded-full">
 
                                     <div class="h-full
                            bg-[#f94242]
@@ -401,8 +421,7 @@
                                 </div>
 
 
-                                <p class="mt-2 text-xs text-right text-gray-500"
-                                    x-text="progress + '%'"></p>
+                                <p class="mt-2 text-xs text-right text-gray-500" x-text="progress + '%'"></p>
 
                             </div>
                         </template>
@@ -498,284 +517,273 @@
     </div>
 
     <script>
-    window.invitationFilter =
-        function (config) {
+        window.invitationFilter =
+            function(config) {
 
-            return {
+                return {
 
-                search:
-                    config.initialSearch ?? '',
+                    search: config.initialSearch ?? '',
 
-                status:
-                    config.initialStatus ?? '',
+                    status: config.initialStatus ?? '',
 
-                loading:
-                    false,
+                    loading: false,
 
-                controller:
-                    null,
+                    controller: null,
 
 
-                async load(
-                    pageUrl = null
-                ) {
-
-                    /*
-                     * Cancel request sebelumnya.
-                     *
-                     * Misalnya user mengetik cepat:
-                     *
-                     * guest0
-                     * guest00
-                     * guest000
-                     *
-                     * kita hanya peduli request
-                     * terakhir.
-                     */
-                    if (this.controller) {
-                        this.controller.abort();
-                    }
-
-
-                    this.controller =
-                        new AbortController();
-
-
-                    this.loading = true;
-
-
-                    try {
-
-                        let url;
-
+                    async load(
+                        pageUrl = null
+                    ) {
 
                         /*
-                         * Pagination mengirim URL
-                         * sendiri.
+                         * Cancel request sebelumnya.
+                         *
+                         * Misalnya user mengetik cepat:
+                         *
+                         * guest0
+                         * guest00
+                         * guest000
+                         *
+                         * kita hanya peduli request
+                         * terakhir.
                          */
-                        if (pageUrl) {
-
-                            url = new URL(
-                                pageUrl,
-                                window.location.origin
-                            );
-
-                        } else {
-
-                            url = new URL(
-                                config.url,
-                                window.location.origin
-                            );
-
+                        if (this.controller) {
+                            this.controller.abort();
                         }
 
 
-                        /*
-                         * Selalu sinkronkan
-                         * search & status terbaru.
-                         */
-                        if (
-                            this.search.trim()
-                            !== ''
-                        ) {
-
-                            url.searchParams.set(
-                                'search',
-                                this.search.trim()
-                            );
-
-                        } else {
-
-                            url.searchParams.delete(
-                                'search'
-                            );
-                        }
+                        this.controller =
+                            new AbortController();
 
 
-                        if (
-                            this.status !== ''
-                        ) {
-
-                            url.searchParams.set(
-                                'status',
-                                this.status
-                            );
-
-                        } else {
-
-                            url.searchParams.delete(
-                                'status'
-                            );
-                        }
+                        this.loading = true;
 
 
-                        /*
-                         * Kalau bukan pagination,
-                         * selalu kembali ke page 1.
-                         */
-                        if (!pageUrl) {
-                            url.searchParams.delete(
-                                'page'
-                            );
-                        }
+                        try {
+
+                            let url;
 
 
-                        const response =
-                            await fetch(
-                                url.toString(),
-                                {
-                                    headers: {
-                                        'Accept':
-                                            'application/json',
+                            /*
+                             * Pagination mengirim URL
+                             * sendiri.
+                             */
+                            if (pageUrl) {
 
-                                        'X-Requested-With':
-                                            'XMLHttpRequest',
-                                    },
+                                url = new URL(
+                                    pageUrl,
+                                    window.location.origin
+                                );
 
-                                    signal:
-                                        this.controller
+                            } else {
+
+                                url = new URL(
+                                    config.url,
+                                    window.location.origin
+                                );
+
+                            }
+
+
+                            /*
+                             * Selalu sinkronkan
+                             * search & status terbaru.
+                             */
+                            if (
+                                this.search.trim() !==
+                                ''
+                            ) {
+
+                                url.searchParams.set(
+                                    'search',
+                                    this.search.trim()
+                                );
+
+                            } else {
+
+                                url.searchParams.delete(
+                                    'search'
+                                );
+                            }
+
+
+                            if (
+                                this.status !== ''
+                            ) {
+
+                                url.searchParams.set(
+                                    'status',
+                                    this.status
+                                );
+
+                            } else {
+
+                                url.searchParams.delete(
+                                    'status'
+                                );
+                            }
+
+
+                            /*
+                             * Kalau bukan pagination,
+                             * selalu kembali ke page 1.
+                             */
+                            if (!pageUrl) {
+                                url.searchParams.delete(
+                                    'page'
+                                );
+                            }
+
+
+                            const response =
+                                await fetch(
+                                    url.toString(), {
+                                        headers: {
+                                            'Accept': 'application/json',
+
+                                            'X-Requested-With': 'XMLHttpRequest',
+                                        },
+
+                                        signal: this.controller
                                             .signal,
-                                }
-                            );
+                                    }
+                                );
 
 
-                        if (!response.ok) {
-                            throw new Error(
-                                'Gagal mengambil invitation.'
-                            );
-                        }
+                            if (!response.ok) {
+                                throw new Error(
+                                    'Gagal mengambil invitation.'
+                                );
+                            }
 
 
-                        const data =
-                            await response.json();
+                            const data =
+                                await response.json();
 
 
-                        /*
-                         * Replace table HTML.
-                         */
-                        this.$refs
-                            .results
-                            .innerHTML =
+                            /*
+                             * Replace table HTML.
+                             */
+                            this.$refs
+                                .results
+                                .innerHTML =
                                 data.html;
 
 
-                        /*
-                         * Update URL browser
-                         * tanpa reload.
-                         */
-                        window.history
-                            .replaceState(
-                                {},
-                                '',
-                                url.pathname
-                                + url.search
+                            /*
+                             * Update URL browser
+                             * tanpa reload.
+                             */
+                            window.history
+                                .replaceState({},
+                                    '',
+                                    url.pathname +
+                                    url.search
+                                );
+
+
+                        } catch (error) {
+
+                            /*
+                             * AbortError normal terjadi
+                             * ketika user mengetik cepat.
+                             */
+                            if (
+                                error.name !==
+                                'AbortError'
+                            ) {
+
+                                console.error(
+                                    'Invitation search error:',
+                                    error
+                                );
+                            }
+
+                        } finally {
+
+                            this.loading =
+                                false;
+
+                        }
+                    },
+
+
+                    /*
+                     * Reset filter.
+                     */
+                    reset() {
+
+                        this.search = '';
+
+                        this.status = '';
+
+                        this.load();
+                    },
+
+
+                    /*
+                     * AJAX pagination.
+                     */
+                    handlePagination(event) {
+
+                        const link =
+                            event.target.closest(
+                                'a'
                             );
 
 
-                    } catch (error) {
-
-                        /*
-                         * AbortError normal terjadi
-                         * ketika user mengetik cepat.
-                         */
-                        if (
-                            error.name
-                            !== 'AbortError'
-                        ) {
-
-                            console.error(
-                                'Invitation search error:',
-                                error
-                            );
+                        if (!link) {
+                            return;
                         }
 
-                    } finally {
 
-                        this.loading =
-                            false;
-
-                    }
-                },
-
-
-                /*
-                 * Reset filter.
-                 */
-                reset() {
-
-                    this.search = '';
-
-                    this.status = '';
-
-                    this.load();
-                },
+                        /*
+                         * Hanya intercept link pagination.
+                         */
+                        const pagination =
+                            link.closest(
+                                'nav'
+                            );
 
 
-                /*
-                 * AJAX pagination.
-                 */
-                handlePagination(event) {
+                        if (!pagination) {
+                            return;
+                        }
 
-                    const link =
-                        event.target.closest(
-                            'a'
+
+                        const href =
+                            link.getAttribute(
+                                'href'
+                            );
+
+
+                        if (!href) {
+                            return;
+                        }
+
+
+                        event.preventDefault();
+
+
+                        this.load(
+                            href
                         );
 
 
-                    if (!link) {
-                        return;
-                    }
+                        /*
+                         * Scroll kembali ke filter/table.
+                         */
+                        this.$el
+                            .scrollIntoView({
+                                behavior: 'smooth',
 
+                                block: 'start',
+                            });
+                    },
 
-                    /*
-                     * Hanya intercept link pagination.
-                     */
-                    const pagination =
-                        link.closest(
-                            'nav'
-                        );
-
-
-                    if (!pagination) {
-                        return;
-                    }
-
-
-                    const href =
-                        link.getAttribute(
-                            'href'
-                        );
-
-
-                    if (!href) {
-                        return;
-                    }
-
-
-                    event.preventDefault();
-
-
-                    this.load(
-                        href
-                    );
-
-
-                    /*
-                     * Scroll kembali ke filter/table.
-                     */
-                    this.$el
-                        .scrollIntoView({
-                            behavior:
-                                'smooth',
-
-                            block:
-                                'start',
-                        });
-                },
+                };
 
             };
-
-        };
-</script>
+    </script>
 
 </x-app-layout>

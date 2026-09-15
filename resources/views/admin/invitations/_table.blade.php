@@ -155,8 +155,8 @@
                                     @csrf
                                     @method('PATCH')
 
-                                    <button type="submit" @disabled(!$invitation->is_checked_in)
-                                        class="w-full px-3 py-2 mx-auto text-xs font-medium text-red-600 transition border border-red-200 rounded-lg cursor-pointer hover:bg-red-50 disabled:cursor-not-allowed disabled:border-gray-200 disabled:text-gray-300 disabled:hover:bg-transparent">
+                                    <button type="submit" @disabled($invitation->scan_count <= 0)
+                                        class="w-full px-3 py-2 mx-auto text-xs font-medium text-white transition bg-red-600 border border-red-600 rounded-lg cursor-pointer hover:bg-red-500 disabled:cursor-not-allowed disabled:bg-white disabled:border-red-300 disabled:text-red-300 disabled:hover:bg-transparent">
                                         Reset Count
                                     </button>
                                 </form>
@@ -170,7 +170,7 @@
                                     @method('PATCH')
 
                                     <button type="submit" @disabled($invitation->is_checked_in)
-                                        class="w-full px-3 py-2 mt-1 text-xs font-medium text-green-600 transition border border-2 border-green-200 rounded-lg cursor-pointer hover:bg-green-50 disabled:cursor-not-allowed disabled:border-green-700 disabled:bg-green-700 disabled:text-white">
+                                        class="w-full px-3 py-2 mt-1 text-xs font-medium text-white transition bg-green-600 border border-2 border-green-200 rounded-lg cursor-pointer hover:bg-green-500 disabled:cursor-not-allowed disabled:bg-white disabled:border-green-300 disabled:text-green-300 disabled:hover:bg-transparent">
                                         Mark as Scanned
                                     </button>
                                 </form>
@@ -178,7 +178,7 @@
                                 {{-- Set Limit --}}
                                 <div>
                                     <button type="button" @click="showLimitModal = true"
-                                        class="w-full px-3 py-2 mt-1 text-xs font-medium text-blue-600 transition border border-blue-200 rounded-lg cursor-pointer hover:bg-blue-50">
+                                        class="w-full px-3 py-2 mt-1 text-xs font-medium text-white transition bg-blue-600 border border-blue-600 rounded-lg cursor-pointer hover:bg-blue-500">
                                         Set Limit
                                     </button>
                                 </div>

@@ -62,38 +62,41 @@
 
 
             {{-- Statistics --}}
-            <div class="grid gap-4 md:grid-cols-3">
+            <div class="grid gap-4 sm:grid-cols-1 lg:grid-cols-2">
+                
+                {{-- Total QR --}}
+        
+                <div class="p-5 bg-white shadow-sm rounded-xl">
 
-                <div class="p-6 bg-white shadow-sm rounded-xl">
                     <p class="text-sm text-gray-500">
-                        Total Invitations
+                        Total QR
                     </p>
 
-                    <p class="mt-2 text-3xl font-semibold text-gray-900">
-                        {{ $event->invitations_count }}
+                    <p class="mt-2 text-2xl font-semibold text-gray-900">
+                        {{ number_format($statistics['total_qr']) }}
                     </p>
+
+                    <p class="mt-1 text-xs text-gray-400">
+                        Generated QR codes
+                    </p>
+
                 </div>
 
+                {{-- Available QR --}}
+                <div class="p-5 bg-white shadow-sm rounded-xl">
 
-                <div class="p-6 bg-white shadow-sm rounded-xl">
                     <p class="text-sm text-gray-500">
-                        Available
+                        Available QR
                     </p>
 
-                    <p class="mt-2 text-3xl font-semibold text-gray-900">
-                        {{ $event->invitations_count - $event->checked_in_count }}
-                    </p>
-                </div>
-
-
-                <div class="p-6 bg-white shadow-sm rounded-xl">
-                    <p class="text-sm text-gray-500">
-                        Checked In
+                    <p class="mt-2 text-2xl font-semibold text-gray-900">
+                        {{ number_format($statistics['available_qr']) }}
                     </p>
 
-                    <p class="mt-2 text-3xl font-semibold text-gray-900">
-                        {{ $event->checked_in_count }}
+                    <p class="mt-1 text-xs text-gray-400">
+                        QR codes that can still be scanned
                     </p>
+
                 </div>
 
             </div>

@@ -68,9 +68,67 @@ class EventController extends Controller
             },
         ]);
 
+        $statistics = [
+
+            /*
+            * Total kapasitas invitation.
+            *
+            * Contoh:
+            *
+            * QR A limit 1
+            * QR B limit 5
+            * QR C limit 3
+            *
+            * Total Invitations = 9
+            */
+            'total_invitations' => (int) $event
+                ->invitations()
+                ->sum('scan_limit'),
+
+
+            /*
+            * Jumlah QR fisik / invitation record.
+            */
+            'total_qr' => $event
+                ->invitations()
+                ->count(),
+
+
+            /*
+            * Total invitation yang sudah digunakan.
+            *
+            * QR dengan:
+            *
+            * limit = 5
+            * scan_count = 2
+            *
+            * berarti menyumbang 2 checked in.
+            */
+            'checked_in' => (int) $event
+                ->invitations()
+                ->sum('scan_count'),
+
+
+            /*
+            * Jumlah QR yang masih dapat digunakan.
+            *
+            * Tidak peduli tersisa 1 atau 10 scan,
+            * selama scan_count < scan_limit,
+            * QR masih dianggap available.
+            */
+            'available_qr' => $event
+                ->invitations()
+                ->whereColumn(
+                    'scan_count',
+                    '<',
+                    'scan_limit'
+                )
+                ->count(),
+        ];
+
         return view(
             'admin.events.show',
-            compact('event')
+            compact('event', 'statistics')
         );
     }
 
