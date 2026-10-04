@@ -18,6 +18,8 @@ window.scannerApp = function(config) {
 
         manualValue: '',
 
+        manualEventId: '',
+
         lastScannedValue: null,
 
         audioContext: null,
@@ -580,7 +582,7 @@ window.scannerApp = function(config) {
          * ==========================================================
          */
 
-        async checkIn(value) {
+        async checkIn(value, eventId = null) {
 
         let soundPlayed = false;
 
@@ -608,6 +610,9 @@ window.scannerApp = function(config) {
                             JSON.stringify({
                                 qr_value:
                                     value,
+
+                                event_id:
+                                    eventId,
                             }),
                     }
                 );
@@ -1078,14 +1083,20 @@ window.scannerApp = function(config) {
     },
 
         async manualCheckIn() {
+
             const value =
                 this.manualValue
                 .trim();
 
 
+            const eventId =
+                this.manualEventId;
+
+
             if (
-                !value ||
-                this.processing
+                !value
+                || !eventId
+                || this.processing
             ) {
                 return;
             }
@@ -1096,7 +1107,12 @@ window.scannerApp = function(config) {
 
             this.processing =
                 true;
-            
+
+
+            /*
+            * Pause scanner ketika
+            * melakukan manual check-in.
+            */
             try {
 
                 this.scanner?.pause(
@@ -1107,18 +1123,23 @@ window.scannerApp = function(config) {
 
 
             /*
-             * CATATAN:
-             *
-             * Saat ini value yang dikirim adalah
-             * guest00001.
-             *
-             * Backend harus mendukung manual guest code.
-             */
+            * Manual check-in mengirim:
+            *
+            * guest_code + event_id
+            */
             await this.checkIn(
-                value
+                value,
+                eventId
             );
 
 
+            /*
+            * Guest code dikosongkan,
+            * tetapi EVENT TIDAK.
+            *
+            * Staff kemungkinan sedang
+            * bekerja pada event yang sama.
+            */
             this.manualValue =
                 '';
         },

@@ -278,33 +278,74 @@
                     </summary>
 
                     <p class="mt-3 text-xs text-gray-500">
-                        Enter the guest code printed below the QR.
+                        Select the event and enter the guest code printed below the QR.
                     </p>
 
-                    <form class="flex gap-2 mt-4" @submit.prevent="manualCheckIn()">
 
-                        <input type="text" x-model="manualValue" placeholder="guest00001" autocomplete="off"
-                            autocapitalize="none" spellcheck="false"
-                            class="flex-1 min-w-0 font-mono text-sm border-gray-300 rounded-lg">
+                    <form class="mt-4 space-y-3" @submit.prevent="manualCheckIn()">
 
-                        <button type="submit" :disabled="processing"
-                            class="rounded-lg
-                       bg-[#f94242] hover:bg-[#c53434] cursor-pointer
-                       px-4 py-2
-                       text-sm
-                       font-medium
-                       text-white
-                       disabled:opacity-50">
+                        {{-- Event --}}
+                        <div>
+                            <label class="block mb-1 text-xs font-medium text-gray-600">
+                                Event
+                            </label>
 
-                            <span x-show="!processing">
-                                Check
-                            </span>
+                            <select x-model="manualEventId" class="w-full text-sm border-gray-300 rounded-lg" required>
+                                <option value="">
+                                    Select Event
+                                </option>
 
-                            <span x-show="processing" x-cloak>
-                                Checking...
-                            </span>
+                                @foreach ($events as $eventItem)
+                                    <option value="{{ $eventItem->id }}">
+                                        {{ $eventItem->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+                        </div>
 
-                        </button>
+
+                        {{-- Guest Code --}}
+                        <div>
+                            <label class="block mb-1 text-xs font-medium text-gray-600">
+                                Guest Code
+                            </label>
+
+                            <div class="flex gap-2">
+
+                                <input type="text" x-model="manualValue" placeholder="guest00001" autocomplete="off"
+                                    autocapitalize="none" spellcheck="false"
+                                    class="flex-1 min-w-0 font-mono text-sm border-gray-300 rounded-lg">
+
+                                <button type="submit"
+                                    :disabled="processing
+                                        ||
+                                        !manualEventId ||
+                                        !manualValue.trim()"
+                                    class="
+                            rounded-lg
+                            bg-[#f94242]
+                            hover:bg-[#c53434]
+                            cursor-pointer
+                            px-4 py-2
+                            text-sm
+                            font-medium
+                            text-white
+                            disabled:opacity-50
+                            disabled:cursor-not-allowed
+                        ">
+
+                                    <span x-show="!processing">
+                                        Check
+                                    </span>
+
+                                    <span x-show="processing" x-cloak>
+                                        Checking...
+                                    </span>
+
+                                </button>
+
+                            </div>
+                        </div>
 
                     </form>
 

@@ -8,9 +8,14 @@ use App\Http\Controllers\Admin\InvitationExportController;
 use App\Http\Controllers\Admin\EventDesignController;
 use App\Http\Controllers\Staff\ScannerController;
 use App\Http\Controllers\Staff\CheckInController;
+use Illuminate\Support\Facades\Auth;
 
 Route::get('/', function () {
-    return view('auth.login');
+    if (Auth::check()) {
+        return redirect()->route('dashboard');
+    }
+
+    return redirect()->route('login');
 });
 
 Route::get('/dashboard', function () {

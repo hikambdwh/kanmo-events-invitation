@@ -21,6 +21,12 @@ class CheckInController extends Controller
                 'string',
                 'max:255',
             ],
+
+            'event_id' => [
+                'nullable',
+                'integer',
+                'exists:events,id',
+            ],
         ]);
 
 
@@ -28,10 +34,15 @@ class CheckInController extends Controller
             $validated['qr_value']
         );
 
+        $manualEventId =
+            $validated['event_id']
+            ?? null;
+
 
         return DB::transaction(
             function () use (
                 $input,
+                $manualEventId,
                 $request
             ) {
 
@@ -133,73 +144,92 @@ class CheckInController extends Controller
 
 
                 /*
-                 * =========================================
-                 * MODE 2
-                 * MANUAL GUEST CODE
-                 *
-                 * Contoh:
-                 * guest00001
-                 * =========================================
-                 */ else {
+ * =========================================
+ * MODE 2
+ * MANUAL GUEST CODE
+ *
+ * Manual check-in HARUS memiliki:
+ *
+ * event_id
+ * guest_code
+ *
+ * Contoh:
+ *
+ * event_id: 3
+ * guest_code: guest00001
+ * =========================================
+ */ else {
 
-                    $guestCode = $input;
-
-
-                    $invitations =
-                        Invitation::query()
-                        ->where(
-                            'guest_code',
-                            $guestCode
-                        )
-                        ->limit(2)
-                        ->lockForUpdate()
-                        ->get();
-
-
-                    if ($invitations->isEmpty()) {
-
-                        return response()->json([
-                            'status' => 'invalid',
-
-                            'message' =>
-                            'Guest code tidak ditemukan.',
-                        ], 404);
-                    }
+                    $guestCode =
+                        $input;
 
 
                     /*
-                     * Kalau guest code ditemukan
-                     * di lebih dari satu event,
-                     * jangan check-in otomatis.
-                     */
-                    if ($invitations->count() > 1) {
+     * Manual input tidak boleh
+     * menentukan invitation hanya
+     * berdasarkan guest_code karena
+     * kode dapat sama antar event.
+     */
+                    if (!$manualEventId) {
 
                         return response()->json([
-                            'status' => 'invalid',
+                            'status' =>
+                            'invalid',
 
                             'message' =>
-                            'Guest code ditemukan pada lebih dari satu invitation.',
+                            'Silakan pilih event terlebih dahulu.',
                         ], 422);
                     }
 
 
-                    $invitation =
-                        $invitations->first();
-
-
-                    $event = Event::query()
+                    /*
+     * Cari event yang dipilih.
+     */
+                    $event =
+                        Event::query()
                         ->find(
-                            $invitation->event_id
+                            $manualEventId
                         );
 
 
                     if (!$event) {
 
                         return response()->json([
-                            'status' => 'invalid',
+                            'status' =>
+                            'invalid',
 
                             'message' =>
-                            'Event invitation tidak ditemukan.',
+                            'Event tidak ditemukan.',
+                        ], 404);
+                    }
+
+
+                    /*
+     * Guest code sekarang dicari
+     * DI DALAM event tertentu.
+     */
+                    $invitation =
+                        Invitation::query()
+                        ->where(
+                            'event_id',
+                            $event->id
+                        )
+                        ->where(
+                            'guest_code',
+                            $guestCode
+                        )
+                        ->lockForUpdate()
+                        ->first();
+
+
+                    if (!$invitation) {
+
+                        return response()->json([
+                            'status' =>
+                            'invalid',
+
+                            'message' =>
+                            'Guest code tidak ditemukan pada event ini.',
                         ], 404);
                     }
                 }

@@ -29,7 +29,7 @@
 
                     <button type="submit"
                         class="rounded-lg cursor-pointer bg-[#f94242] hover:bg-[#c53434] px-4 py-2.5 text-sm font-medium text-white">
-                        Generate
+                        Generate QR
                     </button>
                 </form>
 
