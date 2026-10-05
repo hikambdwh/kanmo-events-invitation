@@ -44,7 +44,7 @@
 
                         <button
                             type="submit"
-                            class="px-5 py-3 text-sm font-medium text-white bg-gray-900 rounded-lg hover:bg-black"
+                            class="px-5 py-3 text-sm font-medium text-white cursor-pointer bg-[#f94242] rounded-lg hover:bg-[#c53434]"
                         >
                             Save Changes
                         </button>

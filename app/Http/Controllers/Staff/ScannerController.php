@@ -8,6 +8,7 @@ use Illuminate\View\View;
 
 class ScannerController extends Controller
 {
+
     public function index(): View
     {
         $events = Event::query()
@@ -15,6 +16,7 @@ class ScannerController extends Controller
             ->get([
                 'id',
                 'name',
+                'event_date',
                 'qr_prefix',
             ]);
 

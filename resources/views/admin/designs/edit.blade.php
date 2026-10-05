@@ -441,8 +441,7 @@
                     class="px-6 py-20 text-center bg-white border-2 border-gray-300 border-dashed rounded-xl">
 
                     <p class="font-medium text-gray-700">
-                        Upload invitation card
-                        terlebih dahulu.
+                        Upload the invitation card first.
                     </p>
 
                 </div>

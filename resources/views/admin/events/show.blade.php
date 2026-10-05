@@ -254,8 +254,7 @@
                 </h3>
 
                 <p class="mt-1 text-sm text-gray-500">
-                    Menghapus event juga akan menghapus seluruh invitation
-                    yang terkait dengan event ini.
+                    Deleting the event will also delete all invitations related to this event.
                 </p>
 
                 <form method="POST" action="{{ route('admin.events.destroy', $event) }}" class="mt-5"

@@ -297,7 +297,7 @@
 
                                 @foreach ($events as $eventItem)
                                     <option value="{{ $eventItem->id }}">
-                                        {{ $eventItem->name }}
+                                        {{ $eventItem->name }} ({{ \Carbon\Carbon::parse($eventItem->event_date)->format('d M Y') }})
                                     </option>
                                 @endforeach
                             </select>
@@ -346,15 +346,9 @@
 
                             </div>
                         </div>
-
                     </form>
-
                 </details>
-
             </div>
-
         </div>
-
     </div>
-
 </x-app-layout>
