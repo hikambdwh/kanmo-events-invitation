@@ -47,6 +47,8 @@ Route::middleware(['auth', 'admin',])->prefix('admin')->name('admin.')->group(fu
         ->name('events.exports.design.start');
     Route::post('/events/{event}/exports/{export}/design/process', [InvitationExportController::class, 'processDesign',])->name('events.exports.design.process');
     Route::patch('/events/{event}/invitations/{invitation}/mark-scanned',[InvitationController::class,'markAsScanned'])->name('events.invitations.mark-scanned');
+    Route::patch('/events/{event}/invitations/{invitation}/undo-scanned', [InvitationController::class, 'undoScanned'])
+        ->name('events.invitations.undo-scanned');
     Route::patch('/events/{event}/invitations/{invitation}/reset',[InvitationController::class,'reset'])
     ->name('events.invitations.reset');
     Route::patch('/events/{event}/invitations/{invitation}/set-limit',[InvitationController::class,'setLimit',])

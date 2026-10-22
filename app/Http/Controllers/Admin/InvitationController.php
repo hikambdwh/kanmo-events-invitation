@@ -340,6 +340,42 @@ class InvitationController extends Controller
     }
 
 
+    public function undoScanned(
+        Event $event,
+        Invitation $invitation
+    ): RedirectResponse {
+        abort_unless($invitation->event_id === $event->id, 404);
+
+        $wasUndone = DB::transaction(function () use ($invitation) {
+            $lockedInvitation = Invitation::query()
+                ->whereKey($invitation->id)
+                ->lockForUpdate()
+                ->firstOrFail();
+
+            if ($lockedInvitation->scan_count <= 0) {
+                return false;
+            }
+
+            $scanCount = $lockedInvitation->scan_count - 1;
+            $attributes = ['scan_count' => $scanCount];
+
+            if ($scanCount === 0) {
+                $attributes['checked_in_at'] = null;
+                $attributes['checked_in_by'] = null;
+            }
+
+            $lockedInvitation->update($attributes);
+
+            return true;
+        });
+
+        if (!$wasUndone) {
+            return back()->with('info', $invitation->guest_code . ' belum pernah digunakan.');
+        }
+
+        return back()->with('success', $invitation->guest_code . ' berhasil dibatalkan 1 scan. Jatah scan bertambah 1 kali.');
+    }
+
     public function reset(
         Event $event,
         Invitation $invitation

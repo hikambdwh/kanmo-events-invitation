@@ -256,7 +256,7 @@ class InvitationExportController extends Controller
                                 'https://api.qrserver.com/v1/create-qr-code/',
                                 [
                                     'size' =>
-                                    '1000x1000',
+                                    '500x500',
 
                                     'data' =>
                                     $qrValue,
@@ -319,11 +319,15 @@ class InvitationExportController extends Controller
 
             foreach ($invitations as $invitation) {
 
+                $imageFileName =
+                    $this->getQrImageFileName(
+                        $invitation
+                    );
+
                 $imagePath =
                     $baseFolder
                     . '/images/'
-                    . $invitation->guest_code
-                    . '.png';
+                    . $imageFileName;
 
                 /*
                 * Jika file sudah pernah masuk ZIP,
@@ -878,11 +882,15 @@ class InvitationExportController extends Controller
                         PATHINFO_FILENAME
                     );
 
+                $imageFileName =
+                    $this->getQrImageFileName(
+                        $invitation
+                    );
+
                 $imagePath =
                     $baseFolder
                     . '/images/'
-                    . $invitation->guest_code
-                    . '.png';
+                    . $imageFileName;
 
                 $zip->addFromString(
                     $imagePath,
@@ -1307,8 +1315,9 @@ class InvitationExportController extends Controller
 
             $sheet->setCellValue(
                 'A' . $row,
-                $invitation->guest_code
-                    . '.png'
+                $this->getQrImageFileName(
+                    $invitation
+                )
             );
 
 
@@ -1785,5 +1794,29 @@ class InvitationExportController extends Controller
         imagedestroy(
             $textImage
         );
+    }
+
+    private function getQrImageFileName(
+        $invitation
+    ): string {
+
+        /*
+     * Ambil 8 karakter terakhir dari qr_token
+     * agar file name tetap unik dan stabil.
+     */
+        $suffix =
+            strtoupper(
+                substr(
+                    $invitation->qr_token,
+                    -10
+                )
+            );
+
+
+        return
+            $invitation->guest_code
+            . '_'
+            . $suffix
+            . '.png';
     }
 }

@@ -142,21 +142,21 @@
 
                             <div x-data="{
                                 showLimitModal: false
-                            }">
+                            }" class="grid grid-cols-2 gap-2">
 
                                 {{-- Reset --}}
                                 <form method="POST"
                                     action="{{ route('admin.events.invitations.reset', [$event, $invitation]) }}"
                                     onsubmit="
                 return confirm(
-                    'Reset {{ $invitation->guest_code }}? QR ini akan dapat digunakan kembali.'
+                    'Reset {{ $invitation->guest_code }}? Seluruh jumlah scan akan direset menjadi 0.'
                 )
             ">
                                     @csrf
                                     @method('PATCH')
 
                                     <button type="submit" @disabled($invitation->scan_count <= 0)
-                                        class="w-full px-3 py-2 mx-auto text-xs font-medium text-white transition bg-red-600 border border-red-600 rounded-lg cursor-pointer hover:bg-red-500 disabled:cursor-not-allowed disabled:bg-white disabled:border-red-300 disabled:text-red-300 disabled:hover:bg-transparent">
+                                        class="w-full px-1 py-2 mx-auto text-xs font-medium text-white transition bg-red-600 border border-red-600 rounded-lg cursor-pointer hover:bg-red-500 disabled:cursor-not-allowed disabled:bg-white disabled:border-red-300 disabled:text-red-300 disabled:hover:bg-transparent">
                                         Reset Count
                                     </button>
                                 </form>
@@ -170,7 +170,7 @@
                                     @method('PATCH')
 
                                     <button type="submit" @disabled($invitation->is_checked_in)
-                                        class="w-full px-3 py-2 mt-1 text-xs font-medium text-white transition bg-green-600 border border-2 border-green-200 rounded-lg cursor-pointer hover:bg-green-500 disabled:cursor-not-allowed disabled:bg-white disabled:border-green-300 disabled:text-green-300 disabled:hover:bg-transparent">
+                                        class="w-full px-1 py-2 mt-1 text-xs font-medium text-white transition bg-green-600 border border-2 border-green-200 rounded-lg cursor-pointer hover:bg-green-500 disabled:cursor-not-allowed disabled:bg-white disabled:border-green-300 disabled:text-green-300 disabled:hover:bg-transparent">
                                         Mark as Scanned
                                     </button>
                                 </form>
@@ -178,10 +178,22 @@
                                 {{-- Set Limit --}}
                                 <div>
                                     <button type="button" @click="showLimitModal = true"
-                                        class="w-full px-3 py-2 mt-1 text-xs font-medium text-white transition bg-blue-600 border border-blue-600 rounded-lg cursor-pointer hover:bg-blue-500">
+                                        class="w-full px-1 py-2 mt-1 text-xs font-medium text-white transition bg-blue-600 border border-blue-600 rounded-lg cursor-pointer hover:bg-blue-500">
                                         Set Limit
                                     </button>
                                 </div>
+                                {{-- Undo one scan --}}
+                                <form method="POST"
+                                    action="{{ route('admin.events.invitations.undo-scanned', [$event, $invitation]) }}"
+                                    onsubmit="return confirm('Batalkan 1 scan {{ $invitation->guest_code }}? Jatah scan akan bertambah 1 kali.')">
+                                    @csrf
+                                    @method('PATCH')
+
+                                    <button type="submit" @disabled($invitation->scan_count <= 0)
+                                        class="w-full px-1 py-2 mt-1 text-xs font-medium text-white transition bg-blue-600 border border-blue-600 rounded-lg cursor-pointer hover:bg-blue-500 disabled:cursor-not-allowed disabled:bg-white disabled:border-blue-300 disabled:text-blue-300 disabled:hover:bg-transparent">
+                                        Undo scanned
+                                    </button>
+                                </form>
 
                                 <template x-teleport="body">
 
