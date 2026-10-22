@@ -1800,15 +1800,16 @@ class InvitationExportController extends Controller
         $invitation
     ): string {
 
-        /*
-     * Ambil 8 karakter terakhir dari qr_token
-     * agar file name tetap unik dan stabil.
-     */
         $suffix =
             strtoupper(
                 substr(
-                    $invitation->qr_token,
-                    -10
+                    hash_hmac(
+                        'sha256',
+                        $invitation->qr_token,
+                        config('app.key')
+                    ),
+                    0,
+                    16
                 )
             );
 
