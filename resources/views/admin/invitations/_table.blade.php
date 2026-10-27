@@ -142,7 +142,7 @@
 
                             <div x-data="{
                                 showLimitModal: false
-                            }" class="grid grid-cols-2 gap-2">
+                            }">
 
                                 {{-- Reset --}}
                                 <form method="POST"
@@ -190,7 +190,7 @@
                                     @method('PATCH')
 
                                     <button type="submit" @disabled($invitation->scan_count <= 0)
-                                        class="w-full px-1 py-2 mt-1 text-xs font-medium text-white transition bg-blue-600 border border-blue-600 rounded-lg cursor-pointer hover:bg-blue-500 disabled:cursor-not-allowed disabled:bg-white disabled:border-blue-300 disabled:text-blue-300 disabled:hover:bg-transparent">
+                                        class="w-full px-1 py-2 mt-1 text-xs font-medium text-white transition bg-yellow-500 border border-yellow-500 rounded-lg cursor-pointer hover:bg-yellow-400 disabled:cursor-not-allowed disabled:bg-white disabled:border-yellow-300 disabled:text-yellow-300 disabled:hover:bg-transparent">
                                         Undo scanned
                                     </button>
                                 </form>
