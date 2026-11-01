@@ -82,4 +82,4 @@ jobs:
         env:
           BASE: ${{ secrets.HOSTINGER_BASE_PATH }}
         run: |
-          ssh hostinger-deploy "test -s '$BASE/apps/kanmo-kei/public/build/manifest.json' && test -s '$BASE/public_html/kanmo_kei/build/manifest.json' && cd '$BASE/apps/kanmo_kei' && php artisan --version"
+          ssh hostinger-deploy "test -s '$BASE/apps/kanmo-kei/public/build/manifest.json' && test -s '$BASE/public_html/kanmo_kei/build/manifest.json' && cd '$BASE/apps/kanmo-kei' && php artisan --version"
