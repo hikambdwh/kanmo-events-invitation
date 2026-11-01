@@ -1,0 +1,85 @@
+name: Deploy Laravel Production
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm_deploy:
+        description: 'Backup selesai dan perubahan siap di production'
+        required: true
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+concurrency:
+  group: kanmo-kei-production
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    if: ${{ inputs.confirm_deploy == true }}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.4'
+          tools: composer:v2
+          coverage: none
+      - name: Install PHP Dependencies
+        run: composer install --no-interaction --prefer-dist --no-progress
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: npm
+      - name: Build Vite
+        run: npm ci && npm run build && test -s public/build/manifest.json
+      - name: Set up SSH
+        env:
+          PRIVATE_KEY: ${{ secrets.SSH_PRIVATE_KEY }}
+          KNOWN_HOSTS: ${{ secrets.SSH_KNOWN_HOSTS }}
+          HOST: ${{ secrets.SSH_HOST }}
+          USER: ${{ secrets.SSH_USER }}
+          PORT: ${{ secrets.SSH_PORT }}
+        run: |
+          mkdir -p ~/.ssh && chmod 700 ~/.ssh
+          printf '%s\n' "$PRIVATE_KEY" > ~/.ssh/id_ed25519 && chmod 600 ~/.ssh/id_ed25519
+          printf '%s\n' "$KNOWN_HOSTS" > ~/.ssh/known_hosts && chmod 600 ~/.ssh/known_hosts
+          printf 'Host hostinger-deploy\n  HostName %s\n  User %s\n  Port %s\n  IdentityFile ~/.ssh/id_ed25519\n  IdentitiesOnly yes\n  BatchMode yes\n  StrictHostKeyChecking yes\n' "$HOST" "$USER" "$PORT" > ~/.ssh/config
+          chmod 600 ~/.ssh/config
+      - name: Verify production bootstrap
+        env:
+          BASE: ${{ secrets.HOSTINGER_BASE_PATH }}
+        run: |
+          ssh hostinger-deploy "test -f '$BASE/apps/kanmo-kei/.env' && test -f '$BASE/apps/kanmo-kei/artisan' && test -f '$BASE/public_html/kanmo_kei/index.php'"
+      - name: Deploy Laravel source (preserve server state)
+        env:
+          BASE: ${{ secrets.HOSTINGER_BASE_PATH }}
+        run: |
+          rsync -azc -e ssh --exclude='.git/' --exclude='.github/' --exclude='.env' --exclude='.env.*' --exclude='vendor/' --exclude='node_modules/' --exclude='storage/' --exclude='bootstrap/cache/' --exclude='public/' --exclude='tests/' ./ "hostinger-deploy:$BASE/apps/kanmo-kei/"
+      - name: Install server dependencies
+        env:
+          BASE: ${{ secrets.HOSTINGER_BASE_PATH }}
+        run: |
+          ssh hostinger-deploy "cd '$BASE/apps/kanmo-kei' && composer install --no-dev --no-interaction --prefer-dist --optimize-autoloader"
+      - name: Copy manifest and assets to Laravel
+        env:
+          BASE: ${{ secrets.HOSTINGER_BASE_PATH }}
+        run: |
+          rsync -azc -e ssh public/build/ "hostinger-deploy:$BASE/apps/kanmo-kei/public/build/"
+      - name: Publish frontend assets
+        env:
+          BASE: ${{ secrets.HOSTINGER_BASE_PATH }}
+        run: |
+          rsync -azc -e ssh public/build/ "hostinger-deploy:$BASE/public_html/kanmo_kei/build/"
+      - name: Refresh Laravel cache
+        env:
+          BASE: ${{ secrets.HOSTINGER_BASE_PATH }}
+        run: |
+          ssh hostinger-deploy "cd '$BASE/apps/kanmo-kei' && php artisan config:clear && php artisan view:clear && php artisan config:cache && php artisan view:cache"
+      - name: Verify deployed files
+        env:
+          BASE: ${{ secrets.HOSTINGER_BASE_PATH }}
+        run: |
+          ssh hostinger-deploy "test -s '$BASE/apps/kanmo-kei/public/build/manifest.json' && test -s '$BASE/public_html/kanmo_kei/build/manifest.json' && cd '$BASE/apps/kanmo_kei' && php artisan --version"
